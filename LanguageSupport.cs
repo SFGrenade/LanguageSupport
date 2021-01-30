@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using GlobalEnums;
+using Language;
 using LanguageSupport.Consts;
 using Modding;
-using On.UnityEngine.UI;
 using UnityEngine;
 
 namespace LanguageSupport
@@ -39,6 +39,8 @@ namespace LanguageSupport
             LangStrings = new LanguageStrings();
 
             InitCallbacks();
+
+            InitLanguage();
         }
 
         public override void Initialize()
@@ -59,24 +61,88 @@ namespace LanguageSupport
             // Hooks
             ModHooks.Instance.LanguageGetHook += OnLanguageGetHook;
             On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages += OnMenuLanguageSettingRefreshAvailableLanguages;
+            On.Language.Language.HasLanguageFile += OnLanguageHasLanguageFile;
+            On.Language.Language.LoadAvailableLanguages += OnLanguageLoadAvailableLanguages;
+            On.LocalizationSettings.GetLanguageEnum += OnLocalizationSettingsGetLanguageEnum;
         }
 
-        private void OnMenuLanguageSettingRefreshAvailableLanguages(MenuLanguageSetting.orig_RefreshAvailableLanguages orig, UnityEngine.UI.MenuLanguageSetting self)
+        private void InitLanguage()
+        {
+            typeof(Language.Language).GetMethod("LoadAvailableLanguages", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+            Language.Language.LoadLanguage();
+        }
+
+        private void OnMenuLanguageSettingRefreshAvailableLanguages(On.UnityEngine.UI.MenuLanguageSetting.orig_RefreshAvailableLanguages orig, UnityEngine.UI.MenuLanguageSetting self)
         {
             orig(self);
-            Log(1);
             List<SupportedLanguages> supLang = new List<SupportedLanguages>((SupportedLanguages[]) self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self));
-            Log(2);
-            var langNames = LangStrings.GetLanguages();
-            Log(3);
-            for (int i = 256; i < 256 + langNames.Count; i++)
+            foreach (var pair in LangStrings.jsonDict)
             {
-                Log(4);
-                supLang.Add((SupportedLanguages) i);
+                try
+                {
+                    SupportedLanguages t = (SupportedLanguages) Enum.Parse(typeof(LanguageCode), pair.Key, true);
+                    supLang.Add(t);
+                }
+                catch (Exception e)
+                {
+                    supLang.Add((SupportedLanguages) LangStrings.numberToName.First(x => x.Value == pair.Key).Key);
+                }
             }
-            Log(5);
             self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, supLang.ToArray());
-            Log(6);
+        }
+
+        private bool OnLanguageHasLanguageFile(On.Language.Language.orig_HasLanguageFile orig, string lang, string sheetTitle)
+        {
+            var ret = orig(lang, sheetTitle);
+            if (!ret)
+            {
+                foreach (var pair in LangStrings.jsonDict)
+                {
+                    if (lang == pair.Key)
+                    {
+                        ret = true;
+                    }
+                }
+            }
+            return ret;
+        }
+
+        private void OnLanguageLoadAvailableLanguages(On.Language.Language.orig_LoadAvailableLanguages orig)
+        {
+            orig();
+            List<string> langs = (List<string>) typeof(Language.Language).GetField("availableLanguages", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+
+            foreach (var pair in LangStrings.jsonDict)
+            {
+                langs.Add(pair.Key);
+            }
+            Log("Discovered Languages:");
+            foreach (var s in langs)
+            {
+                Log($"Language: \"{s}\"");
+            }
+
+            typeof(Language.Language).GetField("availableLanguages", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, langs);
+        }
+
+        private LanguageCode OnLocalizationSettingsGetLanguageEnum(On.LocalizationSettings.orig_GetLanguageEnum orig, string langCode)
+        {
+            try
+            {
+                Enum.Parse(typeof(LanguageCode), langCode, true);
+                return orig(langCode);
+            }
+            catch (Exception e)
+            {
+                foreach (var pair in LangStrings.numberToName)
+                {
+                    if (langCode == pair.Key.ToString())
+                    {
+                        return (LanguageCode) pair.Key;
+                    }
+                }
+            }
+            return LanguageCode.EN;
         }
 
         #region Get/Set Hooks
@@ -85,7 +151,7 @@ namespace LanguageSupport
         {
             if (sheet == "MainMenu")
             {
-                foreach (var pair in LangStrings.GetLanguages())
+                foreach (var pair in LangStrings.numberToName)
                 {
                     if (key == $"LANG_{pair.Key}")
                     {

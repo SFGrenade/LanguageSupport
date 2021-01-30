@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Language;
 using UnityEngine;
 using UnityEngine.Analytics;
 using Logger = Modding.Logger;
@@ -12,14 +13,17 @@ namespace LanguageSupport.Consts
 {
     public class LanguageStrings
     {
-        private readonly Dictionary<string, Dictionary<string, Dictionary<string, string>>> jsonDict = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
-        private readonly Dictionary<int, string> numberToName = new Dictionary<int, string>();
+        public Dictionary<string, Dictionary<string, Dictionary<string, string>>> jsonDict { get; private set; }
+        public Dictionary<int, string> numberToName { get; private set; }
         private readonly string FOLDER = "LanguageSupport";
         private readonly string DIR;
 
         public LanguageStrings()
         {
-            int i = 256;
+            jsonDict = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
+            numberToName = new Dictionary<int, string>();
+
+            int i = 0;
             switch (SystemInfo.operatingSystemFamily)
             {
                 case OperatingSystemFamily.MacOSX:
@@ -46,8 +50,18 @@ namespace LanguageSupport.Consts
 
                 using (StreamReader sr = fileInfo.OpenText())
                 {
-                    jsonDict.Add(i.ToString(), JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(sr.ReadToEnd()));
-                    numberToName.Add(i, basename);
+                    LanguageCode index;
+                    try
+                    {
+                        index = (LanguageCode)Enum.Parse(typeof(LanguageCode), basename, true);
+                    }
+                    catch (Exception e)
+                    {
+                        index = (LanguageCode) 256 + i;
+                        i++;
+                        numberToName.Add((int)index, basename);
+                    }
+                    jsonDict.Add(((int)index).ToString(), JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(sr.ReadToEnd()));
                 }
             }
         }
@@ -63,16 +77,6 @@ namespace LanguageSupport.Consts
             {
                 return jsonDict[GlobalEnums.SupportedLanguages.EN.ToString()][sheet][key].Replace("<br>", "\n");
             }
-        }
-
-        public List<KeyValuePair<int, string>> GetLanguages()
-        {
-            var pairList = new List<KeyValuePair<int, string>>();
-            foreach (var pair in numberToName)
-            {
-                pairList.Add(pair);
-            }
-            return pairList.OrderBy(x => x.Key).ToList();
         }
 
         public bool ContainsKey(string key, string sheet)
