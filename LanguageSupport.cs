@@ -7,8 +7,8 @@ using System.Security.Cryptography;
 using System.Text;
 using GlobalEnums;
 using Language;
-using LanguageSupport.Consts;
 using Modding;
+using On.UnityEngine.UI;
 using UnityEngine;
 
 namespace LanguageSupport
@@ -17,7 +17,8 @@ namespace LanguageSupport
     {
         internal static LanguageSupport Instance;
 
-        public LanguageStrings LangStrings { get; private set; }
+        private readonly string FOLDER = "LanguageSupport";
+        private readonly string DIR;
 
         public override string GetVersion()
         {
@@ -36,17 +37,29 @@ namespace LanguageSupport
         {
             Instance = this;
 
-            LangStrings = new LanguageStrings();
-
-            InitCallbacks();
-
-            InitLanguage();
+            switch (SystemInfo.operatingSystemFamily)
+            {
+                case OperatingSystemFamily.MacOSX:
+                    DIR = Path.GetFullPath(Application.dataPath + "/Resources/Data/Managed/Mods/" + FOLDER);
+                    break;
+                default:
+                    DIR = Path.GetFullPath(Application.dataPath + "/Managed/Mods/" + FOLDER);
+                    break;
+            }
+            if (!Directory.Exists(DIR))
+            {
+                Directory.CreateDirectory(DIR);
+            }
         }
 
         public override void Initialize()
         {
             Log("Initializing");
             Instance = this;
+
+            InitCallbacks();
+
+            InitLanguage();
 
             foreach (var t in GameObject.FindObjectsOfType<UnityEngine.UI.MenuLanguageSetting>())
             {
@@ -59,36 +72,74 @@ namespace LanguageSupport
         private void InitCallbacks()
         {
             // Hooks
-            ModHooks.Instance.LanguageGetHook += OnLanguageGetHook;
-            On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages += OnMenuLanguageSettingRefreshAvailableLanguages;
             On.Language.Language.HasLanguageFile += OnLanguageHasLanguageFile;
-            On.Language.Language.LoadAvailableLanguages += OnLanguageLoadAvailableLanguages;
-            On.LocalizationSettings.GetLanguageEnum += OnLocalizationSettingsGetLanguageEnum;
+            On.Language.Language.GetLanguageFileContents += OnLanguageGetLanguageFileContents;
+            On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages += OnMenuLanguageSettingRefreshAvailableLanguages;
         }
 
         private void InitLanguage()
         {
-            typeof(Language.Language).GetMethod("LoadAvailableLanguages", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
-            Language.Language.LoadLanguage();
-        }
+            #region Dump English Files
 
-        private void OnMenuLanguageSettingRefreshAvailableLanguages(On.UnityEngine.UI.MenuLanguageSetting.orig_RefreshAvailableLanguages orig, UnityEngine.UI.MenuLanguageSetting self)
-        {
-            orig(self);
-            List<SupportedLanguages> supLang = new List<SupportedLanguages>((SupportedLanguages[]) self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self));
-            foreach (var pair in LangStrings.jsonDict)
+            if (!Directory.Exists($"{DIR}/EN"))
             {
-                try
+                Directory.CreateDirectory($"{DIR}/EN");
+            }
+            string[] sheets = new string[]
+            {
+                "Achievements",
+                "Backer Messages",
+                "Banker",
+                "Charm Slug",
+                "Cornifer",
+                "CP2",
+                "CP3",
+                "Credits List",
+                "Dream Witch",
+                "Dreamers",
+                "Elderbug",
+                "Enemy Dreams",
+                "General",
+                "Ghosts",
+                "Hornet",
+                "Hunter",
+                "Iselda",
+                "Jiji",
+                "Journal",
+                "Lore Tablets",
+                "MainMenu",
+                "Map Zones",
+                "Minor NPC",
+                "Nailmasters",
+                "Nailsmith",
+                "Prices",
+                "Prompts",
+                "Quirrel",
+                "Relic Dealer",
+                "Shaman",
+                "Sly",
+                "Stag",
+                "StagMenu",
+                "Titles",
+                "UI",
+                "Zote"
+            };
+            foreach (var sheet in sheets)
+            {
+                if (!File.Exists($"{DIR}/EN/{sheet}.txt"))
                 {
-                    SupportedLanguages t = (SupportedLanguages) Enum.Parse(typeof(LanguageCode), pair.Key, true);
-                    supLang.Add(t);
-                }
-                catch (Exception e)
-                {
-                    supLang.Add((SupportedLanguages) LangStrings.numberToName.First(x => x.Value == pair.Key).Key);
+                    string t = ((TextAsset)Resources.Load($"Languages/EN_{sheet}", typeof(TextAsset))).text;
+                    using (StreamWriter outputFile = new StreamWriter($"{DIR}/EN/{sheet}.txt"))
+                    {
+                        outputFile.Write(t);
+                    }
                 }
             }
-            self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, supLang.ToArray());
+
+            #endregion
+
+            typeof(Language.Language).GetMethod("LoadAvailableLanguages", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+            Language.Language.LoadLanguage();
         }
 
         private bool OnLanguageHasLanguageFile(On.Language.Language.orig_HasLanguageFile orig, string lang, string sheetTitle)
@@ -96,77 +147,57 @@ namespace LanguageSupport
             var ret = orig(lang, sheetTitle);
             if (!ret)
             {
-                foreach (var pair in LangStrings.jsonDict)
+                if (File.Exists($"{DIR}/{lang}/{sheetTitle}.txt"))
                 {
-                    if (lang == pair.Key)
-                    {
-                        ret = true;
-                    }
+                    ret = true;
                 }
             }
             return ret;
         }
 
-        private void OnLanguageLoadAvailableLanguages(On.Language.Language.orig_LoadAvailableLanguages orig)
+        private string OnLanguageGetLanguageFileContents(On.Language.Language.orig_GetLanguageFileContents orig, string sheetTitle)
         {
-            orig();
-            List<string> langs = (List<string>) typeof(Language.Language).GetField("availableLanguages", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-
-            foreach (var pair in LangStrings.jsonDict)
+            string ret = orig(sheetTitle);
+            if (ret == string.Empty)
             {
-                langs.Add(pair.Key);
-            }
-            Log("Discovered Languages:");
-            foreach (var s in langs)
-            {
-                Log($"Language: \"{s}\"");
-            }
-
-            typeof(Language.Language).GetField("availableLanguages", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, langs);
-        }
-
-        private LanguageCode OnLocalizationSettingsGetLanguageEnum(On.LocalizationSettings.orig_GetLanguageEnum orig, string langCode)
-        {
-            try
-            {
-                Enum.Parse(typeof(LanguageCode), langCode, true);
-                return orig(langCode);
-            }
-            catch (Exception e)
-            {
-                foreach (var pair in LangStrings.numberToName)
+                if (File.Exists($"{DIR}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt"))
                 {
-                    if (langCode == pair.Key.ToString())
-                    {
-                        return (LanguageCode) pair.Key;
-                    }
+                    return File.ReadAllText($"{DIR}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt");
                 }
             }
-            return LanguageCode.EN;
+            return ret;
         }
 
-        #region Get/Set Hooks
-
-        private string OnLanguageGetHook(string key, string sheet)
+        private void OnMenuLanguageSettingRefreshAvailableLanguages(On.UnityEngine.UI.MenuLanguageSetting.orig_RefreshAvailableLanguages orig, UnityEngine.UI.MenuLanguageSetting self)
         {
-            if (sheet == "MainMenu")
+            orig(self);
+            SupportedLanguages[] langs;
+            if (GameManager.instance.gameConfig.hideLanguageOption)
             {
-                foreach (var pair in LangStrings.numberToName)
+                langs = (Enum.GetValues(typeof(TestingLanguages)) as SupportedLanguages[]);
+            }
+            else
+            {
+                langs = (Enum.GetValues(typeof(SupportedLanguages)) as SupportedLanguages[]);
+            }
+
+            List<SupportedLanguages> finalLangs = new List<SupportedLanguages>((SupportedLanguages[]) self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self));
+
+            foreach (var l in langs)
+            {
+                if (File.Exists($"{DIR}/{l}/General.txt"))
                 {
-                    if (key == $"LANG_{pair.Key}")
-                    {
-                        return pair.Value;
-                    }
+                    finalLangs.Add(l);
                 }
             }
-            if (LangStrings.ContainsKey(key, sheet))
+
+            self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, finalLangs.ToArray());
+
+            self.optionList = new string[finalLangs.Count];
+            for (int i = 0; i < finalLangs.Count; i++)
             {
-                return LangStrings.Get(key, sheet);
+                self.optionList[i] = finalLangs[i].ToString();
             }
-            return Language.Language.GetInternal(key, sheet);
         }
-
-        #endregion Get/Set Hooks
-
     }
 }
