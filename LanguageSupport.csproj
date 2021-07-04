@@ -1,216 +1,303 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3F8D61FD-254C-4411-94C3-FCE7F79753B4}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LanguageSupport</RootNamespace>
-    <AssemblyName>LanguageSupport</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyTitle>LanguageSupport</AssemblyTitle>
+    <Product>LanguageSupport</Product>
+    <Copyright>Copyright ©  2021</Copyright>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <HollowKnightRefs>../../../GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+  <Target Name="CopyMod" AfterTargets="PostBuildEvent">
+      <Copy SourceFiles="$(TargetPath)" DestinationFolder="E:\GOG\Hollow Knight 1.5 Modded\Hollow Knight_Data\Managed\Mods\" SkipUnchangedFiles="true" />
+      <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="E:\GOG\Hollow Knight 1.5 Modded\Hollow Knight_Data\Managed\Mods\" SkipUnchangedFiles="true" />
+  </Target>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>sgKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaxyCSharp">
+      <HintPath>$(HollowKnightRefs)/GalaxyCSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MMHOOK_Assembly-CSharp">
+      <HintPath>$(HollowKnightRefs)/MMHOOK_Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MMHOOK_PlayMaker">
+      <HintPath>$(HollowKnightRefs)/MMHOOK_PlayMaker.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>$(HollowKnightRefs)/Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>$(HollowKnightRefs)/Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>$(HollowKnightRefs)/MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>$(HollowKnightRefs)/MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="netstandard">
+      <HintPath>$(HollowKnightRefs)/netstandard.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(HollowKnightRefs)/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PlayMaker">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\PlayMaker.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/PlayMaker.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.ComponentModel.Composition">
+      <HintPath>$(HollowKnightRefs)/System.ComponentModel.Composition.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration">
+      <HintPath>$(HollowKnightRefs)/System.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.StackTrace">
+      <HintPath>$(HollowKnightRefs)/System.Diagnostics.StackTrace.dll</HintPath>
+    </Reference>
+    <Reference Include="System.EnterpriseServices">
+      <HintPath>$(HollowKnightRefs)/System.EnterpriseServices.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Globalization.Extensions">
+      <HintPath>$(HollowKnightRefs)/System.Globalization.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression">
+      <HintPath>$(HollowKnightRefs)/System.IO.Compression.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <HintPath>$(HollowKnightRefs)/System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization.Xml">
+      <HintPath>$(HollowKnightRefs)/System.Runtime.Serialization.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Internals">
+      <HintPath>$(HollowKnightRefs)/System.ServiceModel.Internals.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions">
+      <HintPath>$(HollowKnightRefs)/System.Transactions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.XPath.XDocument">
+      <HintPath>$(HollowKnightRefs)/System.Xml.XPath.XDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline">
+      <HintPath>$(HollowKnightRefs)/Unity.Timeline.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.AccessibilityModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.AccessibilityModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AndroidJNIModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.AndroidJNIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ARModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ARModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ARModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ClothModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ClothModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ClusterInputModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ClusterInputModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ClusterInputModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ClusterRendererModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ClusterRendererModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ClusterRendererModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CrashReportingModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.CrashReportingModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.CrashReportingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.DirectorModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DSPGraphModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.DSPGraphModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.GameCenterModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.GameCenterModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.GameCenterModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GIModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.GIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.GridModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.GridModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.GridModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HotReloadModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.HotReloadModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.InputModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ParticlesLegacyModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ParticlesLegacyModule.dll</HintPath>
+    <Reference Include="UnityEngine.LocalizationModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.LocalizationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PerformanceReportingModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.PerformanceReportingModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.PerformanceReportingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ProfilerModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ProfilerModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ScreenCaptureModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.ScreenCaptureModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.ScreenCaptureModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SharedInternalsModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.SharedInternalsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.SpatialTracking">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.SpatialTracking.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.SharedInternalsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SpriteMaskModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.SpriteMaskModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.SpriteMaskModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SpriteShapeModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.SpriteShapeModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.SpriteShapeModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.StandardEvents">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.StandardEvents.dll</HintPath>
+    <Reference Include="UnityEngine.StreamingModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.StreamingModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.StyleSheetsModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.StyleSheetsModule.dll</HintPath>
+    <Reference Include="UnityEngine.SubstanceModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.SubstanceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubsystemsModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.SubsystemsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.TerrainModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainPhysicsModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.TerrainPhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextCoreModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.TextCoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TilemapModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.TilemapModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.TilemapModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Timeline">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.Timeline.dll</HintPath>
+    <Reference Include="UnityEngine.TLSModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.TLSModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsNativeModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UIElementsNativeModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UmbraModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UmbraModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UNETModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UNETModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UNETModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityAnalyticsModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UnityAnalyticsModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityAnalyticsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityConnectModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UnityConnectModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityCurlModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityCurlModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityTestProtocolModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityTestProtocolModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAudioModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestTextureModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VehiclesModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.VehiclesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VFXModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.VFXModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VideoModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.VideoModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VirtualTexturingModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.VirtualTexturingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VRModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.VRModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.WebModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.WebModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.VRModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.WindModule">
-      <HintPath>..\..\..\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\UnityEngine.WindModule.dll</HintPath>
+      <HintPath>$(HollowKnightRefs)/UnityEngine.WindModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.XRModule">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.XRModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LanguageSupport.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Resources\tmprofont" />
+    <EmbeddedResource Include="Resources\noto_serif_thai_bold.json" />
+    <None Include="sgKey.snk" />
+    <EmbeddedResource Include="Resources\noto_serif_thai_bold.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>rem "Copy the Mod's dll into the Mods folder"
-      copy "$(ProjectDir)$(OutputPath)\$(ProjectName).dll" "E:\GOG\Hollow Knight 1432 Modded\hollow_knight_Data\Managed\Mods\$(ProjectName).dll"
-</PostBuildEvent>
-  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SFCore\SFCore.csproj" />
+  </ItemGroup>
 </Project>
