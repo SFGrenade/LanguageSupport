@@ -27,25 +27,20 @@ namespace LanguageSupport
     internal class LanguageSupport : Mod
     {
         internal static LanguageSupport Instance;
-        private readonly string DIR;
+        private readonly string _dir;
 
-        private readonly string FOLDER = "LanguageSupport";
+        private readonly string _folder = "LanguageSupport";
 
         public LanguageSupport() : base("Language Support")
         {
             Instance = this;
 
-            switch (SystemInfo.operatingSystemFamily)
-            {
-                case OperatingSystemFamily.MacOSX:
-                    DIR = Path.GetFullPath(Application.dataPath + "/Resources/Data/Managed/Mods/" + FOLDER);
-                    break;
-                default:
-                    DIR = Path.GetFullPath(Application.dataPath + "/Managed/Mods/" + FOLDER);
-                    break;
-            }
+            _dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new DirectoryNotFoundException("I have no idea how you did this, but good luck figuring it out."), _folder);
 
-            if (!Directory.Exists(DIR)) Directory.CreateDirectory(DIR);
+            if (!Directory.Exists(_dir))
+            {
+                Directory.CreateDirectory(_dir);
+            }
         }
 
         public override string GetVersion()
@@ -103,32 +98,32 @@ namespace LanguageSupport
 
         private void OnTextMeshProLoadFontAsset(On.TMPro.TextMeshPro.orig_LoadFontAsset orig, TextMeshPro self)
         {
-            var m_fontAsset = self.GetAttr<TextMeshPro, TMP_FontAsset>("m_fontAsset");
-            var m_renderer = self.GetAttr<TextMeshPro, Renderer>("m_renderer");
-            var m_sharedMaterial = self.GetAttr<TextMeshPro, Material>("m_sharedMaterial");
+            var mFontAsset = self.GetAttr<TextMeshPro, TMP_FontAsset>("m_fontAsset");
+            var mRenderer = self.GetAttr<TextMeshPro, Renderer>("m_renderer");
+            var mSharedMaterial = self.GetAttr<TextMeshPro, Material>("m_sharedMaterial");
 
-            if (m_fontAsset.name == "noto_serif_thai_bold_tmpro")
+            if (mFontAsset.name == "noto_serif_thai_bold_tmpro")
             {
-                Log($"OnTextMeshProLoadFontAsset - {m_fontAsset.characterDictionary}"); // ""
-                if (m_fontAsset.characterDictionary == null)
+                Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
+                if (mFontAsset.characterDictionary == null)
                 {
-                    m_fontAsset.ReadFontDefinition();
+                    mFontAsset.ReadFontDefinition();
                 }
-                Log($"OnTextMeshProLoadFontAsset - {m_fontAsset.characterDictionary}"); // ""
-                Log($"OnTextMeshProLoadFontAsset - {m_renderer.sharedMaterial}"); // "perpetua_tmpro Material (UnityEngine.Material)"
-                Log($"OnTextMeshProLoadFontAsset - {m_renderer.sharedMaterial.mainTexture}"); // "perpetua_tmpro Atlas (UnityEngine.Texture2D)"
-                Log($"OnTextMeshProLoadFontAsset - {m_fontAsset.atlas}"); // ""
-                Log($"OnTextMeshProLoadFontAsset - {m_fontAsset.material}");
-                Log($"OnTextMeshProLoadFontAsset - {m_renderer.receiveShadows}");
-                Log($"OnTextMeshProLoadFontAsset - {m_renderer.shadowCastingMode}");
+                Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
+                Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial}"); // "perpetua_tmpro Material (UnityEngine.Material)"
+                Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial.mainTexture}"); // "perpetua_tmpro Atlas (UnityEngine.Texture2D)"
+                Log($"OnTextMeshProLoadFontAsset - {mFontAsset.atlas}"); // ""
+                Log($"OnTextMeshProLoadFontAsset - {mFontAsset.material}");
+                Log($"OnTextMeshProLoadFontAsset - {mRenderer.receiveShadows}");
+                Log($"OnTextMeshProLoadFontAsset - {mRenderer.shadowCastingMode}");
             }
 
             orig(self);
         }
 
-        private static AssetBundle abFa = null;
-        private static TMP_FontAsset fa = null;
-        private static Sprite atlas = null;
+        private static AssetBundle _abFa = null;
+        private static TMP_FontAsset _fa = null;
+        private static Sprite _atlas = null;
 
         private void OnChangeFontByLanguageSetFont(On.ChangeFontByLanguage.orig_SetFont orig, ChangeFontByLanguage self)
         {
@@ -144,7 +139,7 @@ namespace LanguageSupport
 
                 if (json)
                 {
-                    if (fa == null)
+                    if (_fa == null)
                     {
                         Log(3);
                         Assembly asm = Assembly.GetExecutingAssembly();
@@ -165,15 +160,15 @@ namespace LanguageSupport
                             string jsonText = System.Text.Encoding.UTF8.GetString(buffer);
 
                             Log(10);
-                            fa = JsonConvert.DeserializeObject<TMP_FontAsset>(jsonText, new TmpFontConverter());
+                            _fa = JsonConvert.DeserializeObject<TMP_FontAsset>(jsonText, new TmpFontConverter());
                             Log(10.5);
-                            fa.name = "noto_serif_thai_bold_tmpro";
+                            _fa.name = "noto_serif_thai_bold_tmpro";
                             Log(11);
-                            Object.DontDestroyOnLoad(fa);
+                            Object.DontDestroyOnLoad(_fa);
                         }
 
-                        fa.atlas = null; // texture2d
-                        fa.material = new Material(Shader.Find("GUI/Text Shader"));
+                        _fa.atlas = null; // texture2d
+                        _fa.material = new Material(Shader.Find("GUI/Text Shader"));
 
                         using (Stream s = asm.GetManifestResourceStream("LanguageSupport.Resources.noto_serif_thai_bold.png"))
                         {
@@ -190,20 +185,20 @@ namespace LanguageSupport
 
                                 // Create sprite from texture
                                 // Split is to cut off the DreamKing.Resources. and the .png
-                                atlas = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                                Object.DontDestroyOnLoad(atlas);
+                                _atlas = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                                Object.DontDestroyOnLoad(_atlas);
                             }
                         }
-                        fa.material.SetTexture("_MainTex", atlas.texture);
-                        fa.atlas = atlas.texture;
+                        _fa.material.SetTexture("_MainTex", _atlas.texture);
+                        _fa.atlas = _atlas.texture;
 
-                        fa.material.SetColor("_Color", Color.white);
+                        _fa.material.SetColor("_Color", Color.white);
                     }
 
-                    if (fa != null)
+                    if (_fa != null)
                     {
                         Log(20);
-                        self.GetAttr<ChangeFontByLanguage, TextMeshPro>("tmpro").font = fa;
+                        self.GetAttr<ChangeFontByLanguage, TextMeshPro>("tmpro").font = _fa;
                         //var tmp = self.GetAttr<ChangeFontByLanguage, TextMeshPro>("tmpro");
                         //Log(21);
                         //tmp.font = fa;
@@ -213,7 +208,7 @@ namespace LanguageSupport
                 }
                 else
                 {
-                    if (abFa == null)
+                    if (_abFa == null)
                     {
                         Log(12);
                         Assembly asm = Assembly.GetExecutingAssembly();
@@ -224,30 +219,30 @@ namespace LanguageSupport
                             if (s == null) return;
 
                             Log(15);
-                            abFa = AssetBundle.LoadFromStream(s);
+                            _abFa = AssetBundle.LoadFromStream(s);
                             Log(16);
-                            Object.DontDestroyOnLoad(abFa);
+                            Object.DontDestroyOnLoad(_abFa);
                         }
                     }
 
                     Log(17);
 
-                    if (fa == null && abFa != null)
+                    if (_fa == null && _abFa != null)
                     {
                         Log(18);
-                        fa = abFa.LoadAsset<TMP_FontAsset>("noto_serif_thai_bold.asset");
+                        _fa = _abFa.LoadAsset<TMP_FontAsset>("noto_serif_thai_bold.asset");
                         Log(18.5);
-                        fa.name = "noto_serif_thai_bold_tmpro";
+                        _fa.name = "noto_serif_thai_bold_tmpro";
                         Log(19);
-                        Object.DontDestroyOnLoad(fa);
+                        Object.DontDestroyOnLoad(_fa);
                     }
 
-                    if (fa != null)
+                    if (_fa != null)
                     {
                         Log(20);
                         var tmp = (TextMeshPro) typeof(ChangeFontByLanguage).GetField("tmpro", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(self);
                         Log(21);
-                        tmp.font = fa;
+                        tmp.font = _fa;
                         Log(22);
                         typeof(ChangeFontByLanguage).GetField("tmpro", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(self, tmp);
                     }
@@ -270,7 +265,7 @@ namespace LanguageSupport
         {
             #region Dump English Files
 
-            if (!Directory.Exists($"{DIR}/EN")) Directory.CreateDirectory($"{DIR}/EN");
+            if (!Directory.Exists($"{_dir}/EN")) Directory.CreateDirectory($"{_dir}/EN");
             string[] sheets =
             {
                 "Achievements",
@@ -311,10 +306,10 @@ namespace LanguageSupport
                 "Zote"
             };
             foreach (var sheet in sheets)
-                if (!File.Exists($"{DIR}/EN/{sheet}.txt"))
+                if (!File.Exists($"{_dir}/EN/{sheet}.txt"))
                 {
                     var t = ((TextAsset) Resources.Load($"Languages/EN_{sheet}", typeof(TextAsset))).text;
-                    using (var outputFile = new StreamWriter($"{DIR}/EN/{sheet}.txt"))
+                    using (var outputFile = new StreamWriter($"{_dir}/EN/{sheet}.txt"))
                     {
                         outputFile.Write(t);
                     }
@@ -343,7 +338,7 @@ namespace LanguageSupport
             var ret = orig(lang, sheetTitle);
             if (!ret)
             {
-                if (File.Exists($"{DIR}/{lang}/{sheetTitle}.txt"))
+                if (File.Exists($"{_dir}/{lang}/{sheetTitle}.txt"))
                 {
                     ret = true;
                 }
@@ -356,9 +351,9 @@ namespace LanguageSupport
             string ret = orig(sheetTitle);
             if (ret == string.Empty)
             {
-                if (File.Exists($"{DIR}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt"))
+                if (File.Exists($"{_dir}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt"))
                 {
-                    return File.ReadAllText($"{DIR}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt");
+                    return File.ReadAllText($"{_dir}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt");
                 }
             }
             return ret;
@@ -382,7 +377,7 @@ namespace LanguageSupport
 
             foreach (var l in customLangs)
             {
-                if (File.Exists($"{DIR}/{l}/General.txt") || (langs.Contains((SupportedLanguages) l)))
+                if (File.Exists($"{_dir}/{l}/General.txt") || (langs.Contains((SupportedLanguages) l)))
                 {
                     finalLangs.Add((SupportedLanguages) l);
                 }
