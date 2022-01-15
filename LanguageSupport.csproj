@@ -9,27 +9,44 @@
     <Copyright>Copyright © SFGrenade 2019-2021</Copyright>
     <AssemblyVersion>1.5.0.0</AssemblyVersion>
     <FileVersion>1.5.0.0</FileVersion>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>bin/$(Configuration)/</OutputPath>
     <LangVersion>latest</LangVersion>
     <NoWarn>8002</NoWarn>
-    <HollowKnightRefs>E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs>
-    <ExportDir>E:/Github_Projects/__Exports/</ExportDir>
+    <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/</HollowKnightRefs>
+    <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs>
+    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Projects/_Export/</ExportDir>
+    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/Github_Projects/__Exports/</ExportDir>
   </PropertyGroup>
   <Target Name="CopyMod" AfterTargets="PostBuildEvent">
-    <RemoveDir Directories="$(ExportDir)/$(TargetName)/" />
+    <RemoveDir Condition="Exists('$(ExportDir)/$(TargetName)/')" Directories="$(ExportDir)/$(TargetName)/" />
     <MakeDir Directories="$(ExportDir)/$(TargetName)/" />
     <MakeDir Directories="$(ExportDir)/$(TargetName)/zip/" />
     <MakeDir Condition="!Exists('$(HollowKnightRefs)/Mods/$(TargetName)/')" Directories="$(HollowKnightRefs)/Mods/$(TargetName)/" />
-    <Copy SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+
+    <Copy Condition="'$(DocumentationFile)'!=''" SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb;$(TargetDir)/$(TargetName).xml" DestinationFolder="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+    <Copy Condition="'$(DocumentationFile)'==''" SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+    
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ExportDir)/$(TargetName)/" />
-    <Copy SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+    
+    <Copy Condition="'$(DocumentationFile)'!=''" SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb;$(TargetDir)/$(TargetName).xml" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+    <Copy Condition="'$(DocumentationFile)'==''" SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+    
     <ZipDirectory SourceDirectory="$(ExportDir)/$(TargetName)/zip/" DestinationFile="$(ExportDir)/$(TargetName)/$(TargetName).zip" />
     <RemoveDir Directories="$(ExportDir)/$(TargetName)/zip/" />
-    
-    <GetFileHash Files="$(ExportDir)/$(TargetName)/$(TargetName).zip" Algorithm="SHA256">
+
+    <PropertyGroup>
+      <OutputFileString>SHA256 - $(AssemblyTitle).dll, Version $(AssemblyVersion):</OutputFileString>
+    </PropertyGroup>
+    <GetFileHash Files="$(ExportDir)/$(TargetName)/$(TargetName).dll" Algorithm="SHA256">
       <Output TaskParameter="Items" ItemName="FilesWithHashes" />
     </GetFileHash>
-    <WriteLinesToFile File="$(ExportDir)/$(TargetName)/SHA.txt" Lines="@(FilesWithHashes->'%(FileHash)')" Overwrite="true" Encoding="UTF-8"/>
+    <PropertyGroup>
+      <OutputZipString>SHA256 - $(AssemblyTitle).zip:</OutputZipString>
+    </PropertyGroup>
+    <GetFileHash Files="$(ExportDir)/$(TargetName)/$(TargetName).zip" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="ZipFilesWithHashes" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(ExportDir)/$(TargetName)/SHA.txt" Lines="$(OutputFileString);@(FilesWithHashes->'%(FileHash)');$(OutputZipString);@(ZipFilesWithHashes->'%(FileHash)')" Overwrite="true" Encoding="UTF-8" />
   </Target>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <SignAssembly>true</SignAssembly>
