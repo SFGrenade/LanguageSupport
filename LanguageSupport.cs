@@ -8,7 +8,6 @@ using GlobalEnums;
 using JetBrains.Annotations;
 using Language;
 using Modding;
-using SFCore.Utils;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -91,9 +90,9 @@ internal class LanguageSupport : Mod
 
     private void OnTextMeshProLoadFontAsset(On.TMPro.TextMeshPro.orig_LoadFontAsset orig, TextMeshPro self)
     {
-        var mFontAsset = self.GetAttr<TextMeshPro, TMP_FontAsset>("m_fontAsset");
-        var mRenderer = self.GetAttr<TextMeshPro, Renderer>("m_renderer");
-        var mSharedMaterial = self.GetAttr<TextMeshPro, Material>("m_sharedMaterial");
+        var mFontAsset = ReflectionHelper.GetField<TextMeshPro, TMP_FontAsset>(self,"m_fontAsset");
+        var mRenderer = ReflectionHelper.GetField<TextMeshPro, Renderer>(self,"m_renderer");
+        var mSharedMaterial = ReflectionHelper.GetField<TextMeshPro, Material>(self,"m_sharedMaterial");
 
         if (mFontAsset.name == "noto_serif_thai_bold_tmpro")
         {
@@ -123,7 +122,7 @@ internal class LanguageSupport : Mod
     {
         orig(self);
             
-        var tmp = self.GetAttr<ChangeFontByLanguage, TextMeshPro>("tmpro");
+        var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
         var tmpMat = _fa.material;
         tmpMat.shader = tmp.font.material.shader;
         tmpMat.SetTexture("_BumpMap",    null);
