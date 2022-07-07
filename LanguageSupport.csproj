@@ -7,13 +7,13 @@
     <Product>LanguageSupport</Product>
     <Description>A Hollow Knight Mod</Description>
     <Copyright>Copyright © SFGrenade 2019-2021</Copyright>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <AssemblyVersion>1.5.1.0</AssemblyVersion>
+    <FileVersion>1.5.1.0</FileVersion>
     <OutputPath>bin/$(Configuration)/</OutputPath>
     <LangVersion>latest</LangVersion>
-    <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/</HollowKnightRefs>
+    <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Games/gog/hollow-knight/game/Hollow Knight_Data/Managed/</HollowKnightRefs>
     <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs>
-    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Projects/_Export/</ExportDir>
+    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Documents/Projects/__Exports/</ExportDir>
     <ExportDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/Github_Projects/__Exports/</ExportDir>
   </PropertyGroup>
   <Target Name="CopyMod" AfterTargets="PostBuildEvent">
@@ -328,8 +328,5 @@
     <EmbeddedResource Include="Resources\tmprofont-test" />
     <EmbeddedResource Include="Resources\tmprofont-test-smaller" />
     <None Include="sgKey.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SFCore\SFCore.csproj" />
   </ItemGroup>
 </Project>
