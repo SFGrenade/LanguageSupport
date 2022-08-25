@@ -8,6 +8,7 @@ using GlobalEnums;
 using JetBrains.Annotations;
 using Language;
 using Modding;
+using SFCore.Utils;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -32,6 +33,11 @@ internal class LanguageSupport : Mod
         {
             Directory.CreateDirectory(_dir);
         }
+        
+        // ToDo debug
+        InitCallbacks();
+        // ToDo debug
+        InitLanguage();
     }
 
     public override string GetVersion()
@@ -52,10 +58,6 @@ internal class LanguageSupport : Mod
         Log("Initializing");
         Instance = this;
 
-        InitCallbacks();
-
-        InitLanguage();
-
         foreach (var t in Object.FindObjectsOfType<UnityEngine.UI.MenuLanguageSetting>()) t.RefreshControls();
 
         Log("Initialized");
@@ -70,20 +72,20 @@ internal class LanguageSupport : Mod
         On.UnityEngine.UI.MenuLanguageSetting.PushUpdateOptionList += OnMenuLanguageSettingPushUpdateOptionList;
         
         // ToDo these break text display
-        //On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
-        //On.TMPro.TextMeshPro.LoadFontAsset += OnTextMeshProLoadFontAsset;
-        //On.TMPro.TMP_FontAsset.ReadFontDefinition += OnTMP_FontAssetReadFontDefinition;
+        On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
+        On.TMPro.TextMeshPro.LoadFontAsset += OnTextMeshProLoadFontAsset;
+        On.TMPro.TMP_FontAsset.ReadFontDefinition += OnTMP_FontAssetReadFontDefinition;
     }
 
     private void OnTMP_FontAssetReadFontDefinition(On.TMPro.TMP_FontAsset.orig_ReadFontDefinition orig, TMP_FontAsset self)
     {
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, FaceInfo>("m_fontInfo")}");
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, Texture2D>("atlas")}");
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, List<TMP_Glyph>>("m_glyphInfoList")}");
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, Dictionary<int, KerningPair>>("m_characterDictionary")}");
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, KerningTable>("m_kerningDictionary")}");
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, List<TMP_FontAsset>>("m_kerningPair")}");
-        //Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, FontCreationSetting>("fontCreationSettings")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, FaceInfo>("m_fontInfo")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, Texture2D>("atlas")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, List<TMP_Glyph>>("m_glyphInfoList")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, Dictionary<int, KerningPair>>("m_characterDictionary")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, KerningTable>("m_kerningDictionary")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, List<TMP_FontAsset>>("m_kerningPair")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, FontCreationSetting>("fontCreationSettings")}");
 
         orig(self);
     }
@@ -96,19 +98,19 @@ internal class LanguageSupport : Mod
 
         if (mFontAsset.name == "noto_serif_thai_bold_tmpro")
         {
-            //Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
+            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
             if (mFontAsset.characterDictionary == null)
             {
                 mFontAsset.ReadFontDefinition();
             }
 
-            //Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
-            //Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial}"); // "perpetua_tmpro Material (UnityEngine.Material)"
-            //Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial.mainTexture}"); // "perpetua_tmpro Atlas (UnityEngine.Texture2D)"
-            //Log($"OnTextMeshProLoadFontAsset - {mFontAsset.atlas}"); // ""
-            //Log($"OnTextMeshProLoadFontAsset - {mFontAsset.material}");
-            //Log($"OnTextMeshProLoadFontAsset - {mRenderer.receiveShadows}");
-            //Log($"OnTextMeshProLoadFontAsset - {mRenderer.shadowCastingMode}");
+            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
+            Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial}"); // "perpetua_tmpro Material (UnityEngine.Material)"
+            Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial.mainTexture}"); // "perpetua_tmpro Atlas (UnityEngine.Texture2D)"
+            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.atlas}"); // ""
+            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.material}");
+            Log($"OnTextMeshProLoadFontAsset - {mRenderer.receiveShadows}");
+            Log($"OnTextMeshProLoadFontAsset - {mRenderer.shadowCastingMode}");
         }
 
         orig(self);
@@ -121,7 +123,8 @@ internal class LanguageSupport : Mod
     private void OnChangeFontByLanguageSetFont(On.ChangeFontByLanguage.orig_SetFont orig, ChangeFontByLanguage self)
     {
         orig(self);
-            
+
+        if (_fa == null) return;
         var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
         var tmpMat = _fa.material;
         tmpMat.shader = tmp.font.material.shader;
@@ -278,7 +281,7 @@ internal class LanguageSupport : Mod
         if (_abFa == null)
         {
             Assembly asm = Assembly.GetExecutingAssembly();
-            using Stream s = asm.GetManifestResourceStream("LanguageSupport.Resources.tmprofont-test-smaller");
+            using Stream s = asm.GetManifestResourceStream("LanguageSupport.Resources.tmprofont-test.fixed");
             if (s == null) return;
 
             _abFa = AssetBundle.LoadFromStream(s);
@@ -292,11 +295,11 @@ internal class LanguageSupport : Mod
 
         if (_fa == null && _abFa != null)
         {
-            _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular-4096x2048-0000xD7FF");
+            _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular-4096x2048-0000xD7FF-better");
             _fa.name = "noto_serif_thai_bold_tmpro";
             Object.DontDestroyOnLoad(_fa);
             _fa.fallbackFontAssets = new List<TMP_FontAsset>();
-            _fa.fallbackFontAssets.AddRange(Object.FindObjectsOfType<TMP_FontAsset>(true));
+            //_fa.fallbackFontAssets.AddRange(Object.FindObjectsOfType<TMP_FontAsset>(true));
         }
 
         Language.Language.LoadAvailableLanguages();

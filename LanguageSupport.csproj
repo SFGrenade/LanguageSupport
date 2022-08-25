@@ -324,9 +324,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\tmprofont" />
-    <EmbeddedResource Include="Resources\tmprofont-test" />
-    <EmbeddedResource Include="Resources\tmprofont-test-smaller" />
+    <None Include="Resources\tmprofont-test.fixed" />
     <None Include="sgKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SFCore\SFCore.csproj" />
   </ItemGroup>
 </Project>
