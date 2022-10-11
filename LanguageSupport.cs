@@ -8,7 +8,6 @@ using GlobalEnums;
 using JetBrains.Annotations;
 using Language;
 using Modding;
-using SFCore.Utils;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -25,6 +24,7 @@ internal class LanguageSupport : Mod
 
     public LanguageSupport() : base("Language Support")
     {
+        Log("!OnChangeFontByLanguageSetFont");
         Instance = this;
 
         _dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new DirectoryNotFoundException("I have no idea how you did this, but good luck figuring it out."), _folder);
@@ -42,6 +42,7 @@ internal class LanguageSupport : Mod
 
     public override string GetVersion()
     {
+        Log("!OnChangeFontByLanguageSetFont");
         var asm = Assembly.GetExecutingAssembly();
         var ver = asm.GetName().Version.ToString();
         var sha1 = SHA1.Create();
@@ -55,7 +56,7 @@ internal class LanguageSupport : Mod
 
     public override void Initialize()
     {
-        Log("Initializing");
+        Log("!OnChangeFontByLanguageSetFont");
         Instance = this;
 
         foreach (var t in Object.FindObjectsOfType<UnityEngine.UI.MenuLanguageSetting>()) t.RefreshControls();
@@ -65,6 +66,7 @@ internal class LanguageSupport : Mod
 
     private void InitCallbacks()
     {
+        Log("!InitCallbacks");
         // Hooks
         On.Language.Language.HasLanguageFile += OnLanguageHasLanguageFile;
         On.Language.Language.GetLanguageFileContents += OnLanguageGetLanguageFileContents;
@@ -75,23 +77,27 @@ internal class LanguageSupport : Mod
         On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
         On.TMPro.TextMeshPro.LoadFontAsset += OnTextMeshProLoadFontAsset;
         On.TMPro.TMP_FontAsset.ReadFontDefinition += OnTMP_FontAssetReadFontDefinition;
+        Log("~InitCallbacks");
     }
 
     private void OnTMP_FontAssetReadFontDefinition(On.TMPro.TMP_FontAsset.orig_ReadFontDefinition orig, TMP_FontAsset self)
     {
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, FaceInfo>("m_fontInfo")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, Texture2D>("atlas")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, List<TMP_Glyph>>("m_glyphInfoList")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, Dictionary<int, KerningPair>>("m_characterDictionary")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, KerningTable>("m_kerningDictionary")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, List<TMP_FontAsset>>("m_kerningPair")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {self.GetAttr<TMP_FontAsset, FontCreationSetting>("fontCreationSettings")}");
+        Log("!OnTMP_FontAssetReadFontDefinition");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, FaceInfo>(self, "m_fontInfo")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, Texture2D>(self, "atlas")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, List<TMP_Glyph>>(self, "m_glyphInfoList")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, Dictionary<int, KerningPair>>(self, "m_characterDictionary")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, KerningTable>(self, "m_kerningDictionary")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, List<TMP_FontAsset>>(self, "m_kerningPair")}");
+        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, FontCreationSetting>(self, "fontCreationSettings")}");
 
         orig(self);
+        Log("~OnTMP_FontAssetReadFontDefinition");
     }
 
     private void OnTextMeshProLoadFontAsset(On.TMPro.TextMeshPro.orig_LoadFontAsset orig, TextMeshPro self)
     {
+        Log("!OnTextMeshProLoadFontAsset");
         var mFontAsset = ReflectionHelper.GetField<TextMeshPro, TMP_FontAsset>(self,"m_fontAsset");
         var mRenderer = ReflectionHelper.GetField<TextMeshPro, Renderer>(self,"m_renderer");
         var mSharedMaterial = ReflectionHelper.GetField<TextMeshPro, Material>(self,"m_sharedMaterial");
@@ -114,6 +120,7 @@ internal class LanguageSupport : Mod
         }
 
         orig(self);
+        Log("~OnTextMeshProLoadFontAsset");
     }
 
     private static AssetBundle _abFa = null;
@@ -122,77 +129,78 @@ internal class LanguageSupport : Mod
 
     private void OnChangeFontByLanguageSetFont(On.ChangeFontByLanguage.orig_SetFont orig, ChangeFontByLanguage self)
     {
+        Log("!OnChangeFontByLanguageSetFont");
         orig(self);
 
         if (_fa == null) return;
         var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
         var tmpMat = _fa.material;
         tmpMat.shader = tmp.font.material.shader;
-        tmpMat.SetTexture("_BumpMap",    null);
-        tmpMat.SetTexture("_Cube",       null);
-        tmpMat.SetTexture("_FaceTex",    null);
-        tmpMat.SetTexture("_MainTex",    _fa.atlas);
-        tmpMat.SetTexture("_OutlineTex", null);
-        tmpMat.SetFloat("_Ambient", 0.5f);
-        tmpMat.SetFloat("_Bevel", 0.5f);
-        tmpMat.SetFloat("_BevelClamp", 0);
-        tmpMat.SetFloat("_BevelOffset", 0);
-        tmpMat.SetFloat("_BevelRoundness", 0);
-        tmpMat.SetFloat("_BevelWidth", 0);
-        tmpMat.SetFloat("_BumpFace", 0);
-        tmpMat.SetFloat("_BumpOutline", 0);
-        tmpMat.SetFloat("_ColorMask", 15);
-        tmpMat.SetFloat("_Diffuse", 0.5f);
-        tmpMat.SetFloat("_FaceDilate", 0);
-        tmpMat.SetFloat("_FaceUVSpeedX", 0);
-        tmpMat.SetFloat("_FaceUVSpeedY", 0);
-        tmpMat.SetFloat("_GlowInner", 0.05f);
-        tmpMat.SetFloat("_GlowOffset", 0);
-        tmpMat.SetFloat("_GlowOuter", 0.05f);
-        tmpMat.SetFloat("_GlowPower", 0.75f);
-        tmpMat.SetFloat("_GradientScale", 5);
-        tmpMat.SetFloat("_LightAngle", 3.1416f);
-        tmpMat.SetFloat("_MaskID", 0);
-        tmpMat.SetFloat("_MaskSoftnessX", 0);
-        tmpMat.SetFloat("_MaskSoftnessY", 0);
-        tmpMat.SetFloat("_OutlineSoftness", 0);
-        tmpMat.SetFloat("_OutlineUVSpeedX", 0);
-        tmpMat.SetFloat("_OutlineUVSpeedY", 0);
-        tmpMat.SetFloat("_OutlineWidth", 0);
-        tmpMat.SetFloat("_PerspectiveFilter", 0.875f);
-        tmpMat.SetFloat("_Reflectivity", 10);
-        tmpMat.SetFloat("_ScaleRatioA", 0.8f);
-        tmpMat.SetFloat("_ScaleRatioB", 0.8f);
-        tmpMat.SetFloat("_ScaleRatioC", 0.6504065f);
-        tmpMat.SetFloat("_ScaleX", 1);
-        tmpMat.SetFloat("_ScaleY", 1);
-        tmpMat.SetFloat("_ShaderFlags", 0);
-        tmpMat.SetFloat("_SpecularPower", 2);
-        tmpMat.SetFloat("_Stencil", 0);
-        tmpMat.SetFloat("_StencilComp", 8);
-        tmpMat.SetFloat("_StencilOp", 0);
-        tmpMat.SetFloat("_StencilReadMask", 255);
-        tmpMat.SetFloat("_StencilWriteMask", 255);
-        tmpMat.SetFloat("_TextureHeight", _fa.atlas.height);
-        tmpMat.SetFloat("_TextureWidth", _fa.atlas.width);
-        tmpMat.SetFloat("_UnderlayDilate", 0.23f);
-        tmpMat.SetFloat("_UnderlayOffsetX", 0);
-        tmpMat.SetFloat("_UnderlayOffsetY", 0);
-        tmpMat.SetFloat("_UnderlaySoftness", 1);
-        tmpMat.SetFloat("_VertexOffsetX", 0);
-        tmpMat.SetFloat("_VertexOffsetY", 0);
-        tmpMat.SetFloat("_WeightBold", 0.75f);
-        tmpMat.SetFloat("_WeightNormal", 0);
-        tmpMat.SetColor("_ClipRect", new Color(-10000, -10000, 10000, 10000));
-        tmpMat.SetColor("_EnvMatrixRotation", new Color(0, 0, 0, 0));
-        tmpMat.SetColor("_FaceColor", new Color(1, 1, 1, 1));
-        tmpMat.SetColor("_GlowColor", new Color(0, 1, 0, 0.5f));
-        tmpMat.SetColor("_MaskCoord", new Color(0, 0, 0, 0));
-        tmpMat.SetColor("_OutlineCoord", new Color(0, 0, 0, 1));
-        tmpMat.SetColor("_ReflectFaceColor", new Color(0, 0, 0, 1));
-        tmpMat.SetColor("_ReflectOutlineColor", new Color(0, 0, 0, 1));
-        tmpMat.SetColor("_SpecularColor", new Color(1, 1, 1, 1));
-        tmpMat.SetColor("_UnderlayColor", new Color(0, 0, 0, 0.221f));
+        //tmpMat.SetTexture("_BumpMap",    null);
+        //tmpMat.SetTexture("_Cube",       null);
+        //tmpMat.SetTexture("_FaceTex",    null);
+        //tmpMat.SetTexture("_MainTex",    _fa.atlas);
+        //tmpMat.SetTexture("_OutlineTex", null);
+        //tmpMat.SetFloat("_Ambient", 0.5f);
+        //tmpMat.SetFloat("_Bevel", 0.5f);
+        //tmpMat.SetFloat("_BevelClamp", 0);
+        //tmpMat.SetFloat("_BevelOffset", 0);
+        //tmpMat.SetFloat("_BevelRoundness", 0);
+        //tmpMat.SetFloat("_BevelWidth", 0);
+        //tmpMat.SetFloat("_BumpFace", 0);
+        //tmpMat.SetFloat("_BumpOutline", 0);
+        //tmpMat.SetFloat("_ColorMask", 15);
+        //tmpMat.SetFloat("_Diffuse", 0.5f);
+        //tmpMat.SetFloat("_FaceDilate", 0);
+        //tmpMat.SetFloat("_FaceUVSpeedX", 0);
+        //tmpMat.SetFloat("_FaceUVSpeedY", 0);
+        //tmpMat.SetFloat("_GlowInner", 0.05f);
+        //tmpMat.SetFloat("_GlowOffset", 0);
+        //tmpMat.SetFloat("_GlowOuter", 0.05f);
+        //tmpMat.SetFloat("_GlowPower", 0.75f);
+        //tmpMat.SetFloat("_GradientScale", 5);
+        //tmpMat.SetFloat("_LightAngle", 3.1416f);
+        //tmpMat.SetFloat("_MaskID", 0);
+        //tmpMat.SetFloat("_MaskSoftnessX", 0);
+        //tmpMat.SetFloat("_MaskSoftnessY", 0);
+        //tmpMat.SetFloat("_OutlineSoftness", 0);
+        //tmpMat.SetFloat("_OutlineUVSpeedX", 0);
+        //tmpMat.SetFloat("_OutlineUVSpeedY", 0);
+        //tmpMat.SetFloat("_OutlineWidth", 0);
+        //tmpMat.SetFloat("_PerspectiveFilter", 0.875f);
+        //tmpMat.SetFloat("_Reflectivity", 10);
+        //tmpMat.SetFloat("_ScaleRatioA", 0.8f);
+        //tmpMat.SetFloat("_ScaleRatioB", 0.8f);
+        //tmpMat.SetFloat("_ScaleRatioC", 0.6504065f);
+        //tmpMat.SetFloat("_ScaleX", 1);
+        //tmpMat.SetFloat("_ScaleY", 1);
+        //tmpMat.SetFloat("_ShaderFlags", 0);
+        //tmpMat.SetFloat("_SpecularPower", 2);
+        //tmpMat.SetFloat("_Stencil", 0);
+        //tmpMat.SetFloat("_StencilComp", 8);
+        //tmpMat.SetFloat("_StencilOp", 0);
+        //tmpMat.SetFloat("_StencilReadMask", 255);
+        //tmpMat.SetFloat("_StencilWriteMask", 255);
+        //tmpMat.SetFloat("_TextureHeight", _fa.atlas.height);
+        //tmpMat.SetFloat("_TextureWidth", _fa.atlas.width);
+        //tmpMat.SetFloat("_UnderlayDilate", 0.23f);
+        //tmpMat.SetFloat("_UnderlayOffsetX", 0);
+        //tmpMat.SetFloat("_UnderlayOffsetY", 0);
+        //tmpMat.SetFloat("_UnderlaySoftness", 1);
+        //tmpMat.SetFloat("_VertexOffsetX", 0);
+        //tmpMat.SetFloat("_VertexOffsetY", 0);
+        //tmpMat.SetFloat("_WeightBold", 0.75f);
+        //tmpMat.SetFloat("_WeightNormal", 0);
+        //tmpMat.SetColor("_ClipRect", new Color(-10000, -10000, 10000, 10000));
+        //tmpMat.SetColor("_EnvMatrixRotation", new Color(0, 0, 0, 0));
+        //tmpMat.SetColor("_FaceColor", new Color(1, 1, 1, 1));
+        //tmpMat.SetColor("_GlowColor", new Color(0, 1, 0, 0.5f));
+        //tmpMat.SetColor("_MaskCoord", new Color(0, 0, 0, 0));
+        //tmpMat.SetColor("_OutlineCoord", new Color(0, 0, 0, 1));
+        //tmpMat.SetColor("_ReflectFaceColor", new Color(0, 0, 0, 1));
+        //tmpMat.SetColor("_ReflectOutlineColor", new Color(0, 0, 0, 1));
+        //tmpMat.SetColor("_SpecularColor", new Color(1, 1, 1, 1));
+        //tmpMat.SetColor("_UnderlayColor", new Color(0, 0, 0, 0.221f));
         _fa.material = tmpMat;
         tmp.font = _fa;
         //tmp.font.atlas = _fa.atlas;
@@ -205,7 +213,8 @@ internal class LanguageSupport : Mod
         //tmp.font.SetAttr("m_fontInfo", _fa.fontInfo);
         //tmp.font.SetAttr("m_kerningDictionary", _fa.kerningDictionary);
         //tmp.font.SetAttr("m_kerningInfo", _fa.kerningInfo);
-        typeof(ChangeFontByLanguage).GetField("tmpro", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(self, tmp);
+        ReflectionHelper.SetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro", tmp);
+        Log("~OnChangeFontByLanguageSetFont");
     }
 
     private new void Log(string message)
@@ -221,6 +230,7 @@ internal class LanguageSupport : Mod
 
     private void InitLanguage()
     {
+        Log("!InitLanguage");
         #region Dump All Files
 
         var langs = Enum.GetNames(typeof(SupportedLanguages));
@@ -280,34 +290,42 @@ internal class LanguageSupport : Mod
 
         if (_abFa == null)
         {
+            Log("!InitLanguage - _abFa == null - 0");
             Assembly asm = Assembly.GetExecutingAssembly();
+            Log("!InitLanguage - _abFa == null - 1");
             using Stream s = asm.GetManifestResourceStream("LanguageSupport.Resources.tmprofont-test.fixed");
+            Log("!InitLanguage - _abFa == null - 2");
             if (s == null) return;
+            Log("!InitLanguage - _abFa == null - 3");
 
             _abFa = AssetBundle.LoadFromStream(s);
+            Log("!InitLanguage - _abFa == null - 4");
             Object.DontDestroyOnLoad(_abFa);
-        }
-
-        foreach (var item in _abFa.GetAllAssetNames())
-        {
-            Log($"ITEM: {item}");
+            Log("!InitLanguage - _abFa == null - 5");
         }
 
         if (_fa == null && _abFa != null)
         {
+            Log("!InitLanguage - _fa == null && _abFa != null - 0");
             _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular-4096x2048-0000xD7FF-better");
+            Log("!InitLanguage - _fa == null && _abFa != null - 1");
             _fa.name = "noto_serif_thai_bold_tmpro";
+            Log("!InitLanguage - _fa == null && _abFa != null - 2");
             Object.DontDestroyOnLoad(_fa);
+            Log("!InitLanguage - _fa == null && _abFa != null - 3");
             _fa.fallbackFontAssets = new List<TMP_FontAsset>();
+            Log("!InitLanguage - _fa == null && _abFa != null - 4");
             //_fa.fallbackFontAssets.AddRange(Object.FindObjectsOfType<TMP_FontAsset>(true));
         }
 
         Language.Language.LoadAvailableLanguages();
         Language.Language.LoadLanguage();
+        Log("~InitLanguage");
     }
 
     private void OnMenuLanguageSettingPushUpdateOptionList(On.UnityEngine.UI.MenuLanguageSetting.orig_PushUpdateOptionList orig, UnityEngine.UI.MenuLanguageSetting self)
     {
+        Log("!OnMenuLanguageSettingPushUpdateOptionList");
         orig(self);
         SupportedLanguages[] langs = (SupportedLanguages[]) self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
         string[] array = new string[langs.Length];
@@ -317,10 +335,12 @@ internal class LanguageSupport : Mod
         }
 
         self.SetOptionList(array);
+        Log("~OnMenuLanguageSettingPushUpdateOptionList");
     }
 
     private bool OnLanguageHasLanguageFile(On.Language.Language.orig_HasLanguageFile orig, string lang, string sheetTitle)
     {
+        Log("!OnLanguageHasLanguageFile");
         var ret = orig(lang, sheetTitle);
         if (!ret)
         {
@@ -330,25 +350,30 @@ internal class LanguageSupport : Mod
             }
         }
 
+        Log("~OnLanguageHasLanguageFile");
         return ret;
     }
 
     private string OnLanguageGetLanguageFileContents(On.Language.Language.orig_GetLanguageFileContents orig, string sheetTitle)
     {
+        Log("!OnLanguageGetLanguageFileContents");
         string ret = orig(sheetTitle);
         if (ret == string.Empty)
         {
             if (File.Exists($"{_dir}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt"))
             {
+                Log("~OnLanguageGetLanguageFileContents");
                 return File.ReadAllText($"{_dir}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt");
             }
         }
 
+        Log("~OnLanguageGetLanguageFileContents");
         return ret;
     }
 
     private void OnMenuLanguageSettingRefreshAvailableLanguages(On.UnityEngine.UI.MenuLanguageSetting.orig_RefreshAvailableLanguages orig, UnityEngine.UI.MenuLanguageSetting self)
     {
+        Log("!OnMenuLanguageSettingRefreshAvailableLanguages");
         orig(self);
         LanguageCode[] customLangs;
         if (GameManager.instance.gameConfig.hideLanguageOption)
@@ -378,5 +403,6 @@ internal class LanguageSupport : Mod
         //{
         //    self.optionList[i] = finalLangs[i].ToString();
         //}
+        Log("~OnMenuLanguageSettingRefreshAvailableLanguages");
     }
 }

@@ -14,7 +14,7 @@
     <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Games/gog/hollow-knight/game/Hollow Knight_Data/Managed/</HollowKnightRefs>
     <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs>
     <ExportDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Documents/Projects/__Exports/</ExportDir>
-    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/Github_Projects/__Exports/</ExportDir>
+    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/Documents/Projects/__Exports/</ExportDir>
   </PropertyGroup>
   <Target Name="CopyMod" AfterTargets="PostBuildEvent">
     <RemoveDir Condition="Exists('$(ExportDir)/$(TargetName)/')" Directories="$(ExportDir)/$(TargetName)/" />
@@ -324,10 +324,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\tmprofont-test.fixed" />
+    <EmbeddedResource Include="Resources/tmprofont-test.fixed" />
     <None Include="sgKey.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SFCore\SFCore.csproj" />
   </ItemGroup>
 </Project>
