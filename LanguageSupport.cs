@@ -33,7 +33,7 @@ internal class LanguageSupport : Mod
         {
             Directory.CreateDirectory(_dir);
         }
-        
+
         // ToDo debug
         InitCallbacks();
         // ToDo debug
@@ -72,7 +72,7 @@ internal class LanguageSupport : Mod
         On.Language.Language.GetLanguageFileContents += OnLanguageGetLanguageFileContents;
         On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages += OnMenuLanguageSettingRefreshAvailableLanguages;
         On.UnityEngine.UI.MenuLanguageSetting.PushUpdateOptionList += OnMenuLanguageSettingPushUpdateOptionList;
-        
+
         // ToDo these break text display
         On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
         On.TMPro.TextMeshPro.LoadFontAsset += OnTextMeshProLoadFontAsset;
