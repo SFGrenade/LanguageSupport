@@ -1,0 +1,41 @@
+<Project>
+    <Target Name="Copy mod to export dir" AfterTargets="PostBuildEvent">
+        <!-- Remove export dir and make a new one (it's simpler than removing individual files inside the folder) -->
+        <RemoveDir Condition="Exists('$(ExportDir)/$(TargetName)/')" Directories="$(ExportDir)/$(TargetName)/" />
+        <MakeDir Directories="$(ExportDir)/$(TargetName)/" />
+        <MakeDir Directories="$(ExportDir)/$(TargetName)/zip/" />
+
+        <!-- Copy built .dll into the export folder -->
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ExportDir)/$(TargetName)/" />
+
+        <!-- Copy built files (.dll, .pdb & .xml as well as optional dep libs) into the export folder for zipping -->
+        <Copy Condition="'$(DocumentationFile)'!=''" SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb;$(TargetDir)/$(TargetName).xml" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+        <Copy Condition="'$(DocumentationFile)'==''" SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+
+        <!-- Zip the release package -->
+        <ZipDirectory SourceDirectory="$(ExportDir)/$(TargetName)/zip/" DestinationFile="$(ExportDir)/$(TargetName)/$(TargetName).zip" />
+        <RemoveDir Directories="$(ExportDir)/$(TargetName)/zip/" />
+
+        <PropertyGroup>
+            <OutputFileString>SHA256 - $(AssemblyTitle).dll, Version $(AssemblyVersion):</OutputFileString>
+        </PropertyGroup>
+        <GetFileHash Files="$(ExportDir)/$(TargetName)/$(TargetName).dll" Algorithm="SHA256">
+            <Output TaskParameter="Items" ItemName="FilesWithHashes" />
+        </GetFileHash>
+        <PropertyGroup>
+            <OutputZipString>SHA256 - $(AssemblyTitle).zip:</OutputZipString>
+        </PropertyGroup>
+        <GetFileHash Files="$(ExportDir)/$(TargetName)/$(TargetName).zip" Algorithm="SHA256">
+            <Output TaskParameter="Items" ItemName="ZipFilesWithHashes" />
+        </GetFileHash>
+        <WriteLinesToFile File="$(ExportDir)/$(TargetName)/SHA.txt" Lines="$(OutputFileString);@(FilesWithHashes->'%(FileHash)');$(OutputZipString);@(ZipFilesWithHashes->'%(FileHash)')" Overwrite="true" Encoding="UTF-8" />
+    </Target>
+    <Target Name="Copy mod to game dir" AfterTargets="PostBuildEvent">
+        <!-- Make mod folder in game dir if not already there -->
+        <MakeDir Condition="!Exists('$(HollowKnightRefs)/Mods/$(TargetName)/')" Directories="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+
+        <!-- Copy built files (.dll, .pdb & .xml as well as optional dep libs) into the game's mod folder -->
+        <Copy Condition="'$(DocumentationFile)'!=''" SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb;$(TargetDir)/$(TargetName).xml" DestinationFolder="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+        <Copy Condition="'$(DocumentationFile)'==''" SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(HollowKnightRefs)/Mods/$(TargetName)/" />
+    </Target>
+</Project>

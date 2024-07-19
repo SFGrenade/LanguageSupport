@@ -29,3 +29,8 @@ This mod enables the use of additional languages in a similar way CustomKnight d
 8. Add a line at the top that says `<entry name="LANG_##">Language Name Here</entry>`, which `##` being the same Language Code from step 5
 9. Start the game
 10. The language should now be selectable in the options
+
+# EUPL
+                      Copyright (c) 2024 SFGrenade
+                      Licensed under the EUPL-1.2
+https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12

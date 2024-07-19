@@ -1,7 +1,391 @@
+
+################################################################################
+# --- custom ---
+################################################################################
+LocalOverrides.targets
+
+
+
+################################################################################
+# --- https://raw.githubusercontent.com/github/gitignore/main/Global/JetBrains.gitignore ---
+################################################################################
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# AWS User-specific
+.idea/**/aws.xml
+
+# Generated files
+.idea/**/contentModel.xml
+
+# Sensitive or high-churn files
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# Gradle and Maven with auto-import
+# When using Gradle or Maven with auto-import, you should exclude module files,
+# since they will be recreated, and may cause churn.  Uncomment if using
+# auto-import.
+# .idea/artifacts
+# .idea/compiler.xml
+# .idea/jarRepositories.xml
+# .idea/modules.xml
+# .idea/*.iml
+# .idea/modules
+# *.iml
+# *.ipr
+
+# CMake
+cmake-build-*/
+
+# Mongo Explorer plugin
+.idea/**/mongoSettings.xml
+
+# File-based project format
+*.iws
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Cursive Clojure plugin
+.idea/replstate.xml
+
+# SonarLint plugin
+.idea/sonarlint/
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Editor-based Rest Client
+.idea/httpRequests
+
+# Android studio 3.1+ serialized cache file
+.idea/caches/build_file_checksums.ser
+
+
+
+################################################################################
+# --- https://raw.githubusercontent.com/github/gitignore/main/Global/VisualStudioCode.gitignore ---
+################################################################################
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+
+
+#################################################################################
+## --- https://raw.githubusercontent.com/github/gitignore/main/community/DotNet/InforCMS.gitignore ---
+#################################################################################
+## gitignore template for InforCRM (formerly SalesLogix)
+## website: https://www.infor.com/product-summary/cx/infor-crm/
+##
+## Recommended: VisualStudio.gitignore
+#
+## Ignore model files that are auto-generated
+#ModelIndex.xml
+#ExportedFiles.xml
+#
+## Ignore deployment files
+#[Mm]odel/[Dd]eployment
+#
+## Force include portal SupportFiles
+#!Model/Portal/*/SupportFiles/[Bb]in/
+#!Model/Portal/PortalTemplates/*/SupportFiles/[Bb]in
+
+
+
+#################################################################################
+## --- https://raw.githubusercontent.com/github/gitignore/main/community/DotNet/Kentico.gitignore ---
+#################################################################################
+## gitignore template for using Kentico CMS
+## website: http://www.kentico.com/
+##
+## Recommended template: VisualStudio.gitignore
+#
+## Include some Kentico folders excluded by Visual Studio rules
+#!CMS/CMSAdminControls/*/
+#!CMS/CMSModules/System/*/
+#!CMS/App_Data/CIRepository/**
+#
+## Kentico temporary/environment files
+#CMS/App_Data/AzureCache
+#CMS/App_Data/AzureTemp
+#CMS/App_Data/CMSModules/DeviceProfile/logFiftyOne.txt
+#CMS/App_Data/CMSModules/DeviceProfiles/logFiftyOne.txt
+#CMS/App_Data/CMSModules/WebFarm/webfarm.sync
+#CMS/App_Data/CMSTemp
+#CMS/App_Data/Persistent
+#CMS/CMSSiteUtils/Export
+#CMS/CMSSiteUtils/Import
+#
+## Ignore all smart search indexes, but not the other system folder contents
+#CMS/App_Data/CMSModules/SmartSearch/**
+#!CMS/App_Data/CMSModules/SmartSearch/*/
+#!CMS/App_Data/CMSModules/SmartSearch/_StopWords/**
+#!CMS/App_Data/CMSModules/SmartSearch/_Synonyms/**
+#
+### Kentico Starter Sites
+## Starter site resource Files
+#CMS/App_Data/DancingGoat
+#
+## Starter site web templates
+#CMS/App_Data/Templates/CommunitySite
+#CMS/App_Data/Templates/CorporateSite
+#CMS/App_Data/Templates/DancingGoat
+#CMS/App_Data/Templates/EcommerceSite
+#CMS/App_Data/Templates/IntranetPortal
+#CMS/App_Data/Templates/PersonalSite
+#
+## Starter site app themes
+#CMS/App_Themes/CommunitySite
+#CMS/App_Themes/CorporateSite
+#CMS/App_Themes/EcommerceSite
+#CMS/App_Themes/IntranetPortal*
+#CMS/App_Themes/PersonalSite
+#
+## Starter site ASPX templates
+#CMS/CMSTemplates/CorporateSite
+#
+## Starter site media libraries
+#CMS/CommunitySite
+#CMS/CorporateSite
+#CMS/DancingGoat
+#CMS/EcommerceSite
+#CMS/IntranetPortal
+#CMS/PersonalSite
+#
+### Project specific ignores
+## Sensitive settings
+#AppSettings.config
+#ConnectionStrings.config
+#
+## Project media libraries (recommend shared file storage)
+## e.g. CMS/{SiteCodeName}
+
+
+
+#################################################################################
+## --- https://raw.githubusercontent.com/github/gitignore/main/community/DotNet/Umbraco.gitignore ---
+#################################################################################
+### Ignore Umbraco files/folders generated for each instance
+###
+### Get latest from https://github.com/github/gitignore/blob/main/Umbraco.gitignore
+#
+## Note: VisualStudio gitignore rules may also be relevant
+#
+## Umbraco
+## Ignore unimportant folders generated by Umbraco
+#**/App_Data/Logs/
+#**/App_Data/[Pp]review/
+#**/App_Data/TEMP/
+#**/App_Data/NuGetBackup/
+#
+## Ignore Umbraco content cache file
+#**/App_Data/umbraco.config
+#
+### this [Uu]mbraco/ folder should be created by cmd like `Install-Package UmbracoCms -Version 8.5.3`
+### you can find your Umbraco version in your Web.config. (i.e. <add key="Umbraco.Core.ConfigurationStatus" value="8.5.3" />)
+### Uncomment this line if you think it fits the way you work on your project.
+### **/[Uu]mbraco/
+#
+### The [Mm]edia/ folder contains content. Content may vary by environment and should therefore not be added to source control.
+### Uncomment this line if you think it fits the way you work on your project.
+### **/[Mm]edia/ 
+#
+## Don't ignore Umbraco packages (VisualStudio.gitignore mistakes this for a NuGet packages folder)
+## Make sure to include details from VisualStudio.gitignore BEFORE this
+#!**/App_Data/[Pp]ackages/*
+#!**/[Uu]mbraco/[Dd]eveloper/[Pp]ackages/*
+#!**/[Uu]mbraco/[Vv]iews/[Pp]ackages/*
+#
+## ImageProcessor DiskCache
+#**/App_Data/cache/
+#
+## Ignore the Models Builder models out of date flag
+#**/ood.flag
+#
+## NEW for version 9 .Net 5 (Core)
+##ignore umbraco backoffice assest from wwwroot
+#**/wwwroot/umbraco/
+#
+## SQLite files
+#*.sqlite.db*
+#
+##ignore umbraco data/views/settings
+#**/umbraco/
+#
+##include default location for modelsbuilder output
+#!**/umbraco/models
+#
+##include default location for packages
+#!**/umbraco/Data/packages
+
+
+
+################################################################################
+# --- https://raw.githubusercontent.com/github/gitignore/main/community/DotNet/core.gitignore ---
+################################################################################
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# Visual Studio Code
+.vscode
+
+# Rider
+.idea
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 2015
+.vs/
+
+
+
+#################################################################################
+## --- https://raw.githubusercontent.com/github/gitignore/main/Unity.gitignore ---
+#################################################################################
+## --- apparently this is causing problems with regular c# projects ---
+#################################################################################
+## This .gitignore file should be placed at the root of your Unity project directory
+##
+## Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
+##
+#/[Ll]ibrary/
+#/[Tt]emp/
+#/[Oo]bj/
+#/[Bb]uild/
+#/[Bb]uilds/
+#/[Ll]ogs/
+#/[Uu]ser[Ss]ettings/
+#
+## MemoryCaptures can get excessive in size.
+## They also could contain extremely sensitive data
+#/[Mm]emoryCaptures/
+#
+## Recordings can get excessive in size
+#/[Rr]ecordings/
+#
+## Uncomment this line if you wish to ignore the asset store tools plugin
+## /[Aa]ssets/AssetStoreTools*
+#
+## Autogenerated Jetbrains Rider plugin
+#/[Aa]ssets/Plugins/Editor/JetBrains*
+#
+## Visual Studio cache directory
+#.vs/
+#
+## Gradle cache directory
+#.gradle/
+#
+## Autogenerated VS/MD/Consulo solution and project files
+#ExportedObj/
+#.consulo/
+#*.csproj
+#*.unityproj
+#*.sln
+#*.suo
+#*.tmp
+#*.user
+#*.userprefs
+#*.pidb
+#*.booproj
+#*.svd
+#*.pdb
+#*.mdb
+#*.opendb
+#*.VC.db
+#
+## Unity3D generated meta files
+#*.pidb.meta
+#*.pdb.meta
+#*.mdb.meta
+#
+## Unity3D generated file on crash reports
+#sysinfo.txt
+#
+## Builds
+#*.apk
+#*.aab
+#*.unitypackage
+#*.app
+#
+## Crashlytics generated file
+#crashlytics-build.properties
+#
+## Packed Addressables
+#/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+#
+## Temporary auto-generated Android Assets
+#/[Aa]ssets/[Ss]treamingAssets/aa.meta
+#/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+
+
+################################################################################
+# --- https://raw.githubusercontent.com/github/gitignore/main/VisualStudio.gitignore ---
+################################################################################
 ## Ignore Visual Studio temporary files, build results, and
 ## files generated by popular Visual Studio add-ons.
 ##
-## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
+## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # User-specific files
 *.rsuser
@@ -90,6 +474,7 @@ StyleCopReport.xml
 *.tmp_proj
 *_wpftmp.csproj
 *.log
+*.tlog
 *.vspscc
 *.vssscc
 .builds
@@ -241,7 +626,7 @@ orleans.codegen.cs
 
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)
-*.snk
+#*.snk
 
 # Since there are multiple workflows, uncomment next line to ignore bower_components
 # (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
@@ -292,6 +677,17 @@ node_modules/
 
 # Visual Studio 6 auto-generated workspace file (contains which files were open etc.)
 *.vbw
+
+# Visual Studio 6 auto-generated project file (contains which files were open etc.)
+*.vbp
+
+# Visual Studio 6 workspace and project file (working project files containing files to include in project)
+*.dsw
+*.dsp
+
+# Visual Studio 6 technical files
+*.ncb
+*.aps
 
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
@@ -349,6 +745,9 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
+# Visual Studio History (VSHistory) files
+.vshistory/
+
 # BeatPulse healthcheck temp database
 healthchecksdb
 
@@ -360,3 +759,24 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# VS Code files for those working on multiple tools
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+# Windows Installer files from build outputs
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# JetBrains Rider
+*.sln.iml
