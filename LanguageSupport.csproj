@@ -17,7 +17,7 @@
     <AssemblyOriginatorKeyFile>../sgKey.snk</AssemblyOriginatorKeyFile>
     <HollowKnightRefs />
     <ExportDir />
-    <!--<DocumentationFile>$(OutputPath)/$(AssemblyTitle).xml</DocumentationFile>-->
+    <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
   </PropertyGroup>
   <Import Project="LocalOverrides.targets" Condition="Exists('LocalOverrides.targets')" />
   <Import Project="build_steps.targets" />
