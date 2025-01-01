@@ -6,7 +6,7 @@
     <AssemblyName>LanguageSupport</AssemblyName>
     <AssemblyTitle>LanguageSupport</AssemblyTitle>
     <Description>A Hollow Knight Mod</Description>
-    <Copyright>Copyright © SFGrenade 2024</Copyright>
+    <Copyright>Copyright © SFGrenade 2025</Copyright>
     <AssemblyVersion>1.5.1.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <ImplicitUsings>false</ImplicitUsings>

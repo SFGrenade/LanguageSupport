@@ -31,6 +31,6 @@ This mod enables the use of additional languages in a similar way CustomKnight d
 10. The language should now be selectable in the options
 
 # EUPL
-                      Copyright (c) 2024 SFGrenade
+                      Copyright (c) 2025 SFGrenade
                       Licensed under the EUPL-1.2
 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
