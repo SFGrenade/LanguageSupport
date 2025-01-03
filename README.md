@@ -6,6 +6,7 @@ This mod enables the use of additional languages in a similar way CustomKnight d
 
 1. Install the mod
 2. Download a language pack
+    1. I hope to have https://github.com/SFGrenade/LanguageSupport-Repo be a relatively populated collection in the future
 3. Run the game once
     1. This generates english translation files
 4. Exit the game
@@ -29,6 +30,7 @@ This mod enables the use of additional languages in a similar way CustomKnight d
 8. Add a line at the top that says `<entry name="LANG_##">Language Name Here</entry>`, which `##` being the same Language Code from step 5
 9. Start the game
 10. The language should now be selectable in the options
+11. Please open an issue or pull request at https://github.com/SFGrenade/LanguageSupport-Repo, so others can use the translation as well!
 
 # EUPL
                       Copyright (c) 2025 SFGrenade
