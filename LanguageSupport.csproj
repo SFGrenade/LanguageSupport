@@ -15,8 +15,8 @@
     <LangVersion>latest</LangVersion>
     <PathMap>$(MSBuildProjectDirectory)=source</PathMap>
     <AssemblyOriginatorKeyFile>../sgKey.snk</AssemblyOriginatorKeyFile>
-    <HollowKnightRefs />
-    <ExportDir />
+    <HollowKnightRefs>../HkRefs</HollowKnightRefs>
+    <ExportDir>bin/Publish</ExportDir>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
   </PropertyGroup>
   <Import Project="LocalOverrides.targets" Condition="Exists('LocalOverrides.targets')" />
@@ -33,6 +33,7 @@
     <Folder Include="test" />
     <None Include=".gitignore" />
     <None Include="LICENSE" />
+    <None Include="ModDependencies.txt" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
