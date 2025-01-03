@@ -7,7 +7,7 @@
     <AssemblyTitle>LanguageSupport</AssemblyTitle>
     <Description>A Hollow Knight Mod</Description>
     <Copyright>Copyright © SFGrenade 2025</Copyright>
-    <AssemblyVersion>1.5.1.0</AssemblyVersion>
+    <AssemblyVersion>1.5.1.2</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <ImplicitUsings>false</ImplicitUsings>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
