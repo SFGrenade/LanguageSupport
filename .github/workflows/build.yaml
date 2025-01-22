@@ -14,6 +14,13 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Get tag number from tag string
+        id: tag_number
+        run: |
+          orig_tag="${{ github.ref_name }}"
+          echo "tag_number=${orig_tag/v/}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Checkout master
         uses: actions/checkout@v4
         with:
@@ -34,7 +41,7 @@ jobs:
         working-directory: master
 
       - name: Build master
-        run: dotnet build -c Release
+        run: dotnet build -c Release /p:AssemblyVersion=${{ steps.tag_number.outputs.tag_number }}
         working-directory: master
 
       - name: Prepare master artifacts for release
@@ -61,7 +68,7 @@ jobs:
         # the same as the assembly version) to version.txt. The contents of these files are read to step outputs for use in release
         run: |
           $sha = (Get-Content artifacts/Publish-Master/LanguageSupport/SHA.txt)[3]
-          $ver = "${{  github.ref_name }}"
+          $ver = "${{ github.ref_name }}"
           echo "archiveHash=$sha" >> $env:GITHUB_OUTPUT
           echo "buildVersion=$ver" >> $env:GITHUB_OUTPUT
 
