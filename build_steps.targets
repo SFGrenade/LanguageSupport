@@ -9,8 +9,8 @@
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ExportDir)/$(TargetName)/" />
 
         <!-- Copy built files (.dll, .pdb & .xml as well as optional dep libs) into the export folder for zipping -->
-        <Copy Condition="'$(DocumentationFile)'!=''" SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb;$(TargetDir)/$(TargetName).xml" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
-        <Copy Condition="'$(DocumentationFile)'==''" SourceFiles="ReadMe.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+        <Copy Condition="'$(DocumentationFile)'!=''" SourceFiles="README.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb;$(TargetDir)/$(TargetName).xml" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
+        <Copy Condition="'$(DocumentationFile)'==''" SourceFiles="README.md;$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(ExportDir)/$(TargetName)/zip/" />
 
         <!-- Zip the release package -->
         <ZipDirectory SourceDirectory="$(ExportDir)/$(TargetName)/zip/" DestinationFile="$(ExportDir)/$(TargetName)/$(TargetName).zip" />
