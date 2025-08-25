@@ -26,6 +26,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="$(HollowKnightRefs)/*.dll" />
+    <Reference Condition="!Exists('../SFCore/SFCore.csproj')" Include="$(HollowKnightRefs)/Mods/SFCore/SFCore.dll" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources" />
@@ -38,5 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources/tmprofont-test.fixed" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Condition="Exists('../SFCore/SFCore.csproj')" Include="../SFCore/SFCore.csproj" />
   </ItemGroup>
 </Project>
