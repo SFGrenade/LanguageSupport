@@ -11,11 +11,18 @@ using Modding;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using SFCore.Generics;
 
 namespace LanguageSupport;
 
 [UsedImplicitly]
-internal class LanguageSupport : Mod
+public class LsGlobalSettings
+{
+    public LanguageCode lastSelectedLanguage = LanguageCode.N;
+}
+
+[UsedImplicitly]
+public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
 {
     internal static LanguageSupport Instance;
     private readonly string _dir;
@@ -38,19 +45,7 @@ internal class LanguageSupport : Mod
         InitLanguage();
     }
 
-    public override string GetVersion()
-    {
-        Log("!GetVersion");
-        var asm = Assembly.GetExecutingAssembly();
-        var ver = asm.GetName().Version.ToString();
-        var sha1 = SHA1.Create();
-        var stream = File.OpenRead(asm.Location);
-        var hashBytes = sha1.ComputeHash(stream);
-        var hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-        stream.Close();
-        sha1.Clear();
-        return $"{ver}-{hash.Substring(0, 6)}";
-    }
+    public override string GetVersion() => SFCore.Utils.Util.GetVersion(Assembly.GetExecutingAssembly());
 
     public override void Initialize()
     {
@@ -73,7 +68,6 @@ internal class LanguageSupport : Mod
         On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages += OnMenuLanguageSettingRefreshAvailableLanguages;
         On.UnityEngine.UI.MenuLanguageSetting.PushUpdateOptionList += OnMenuLanguageSettingPushUpdateOptionList;
 
-        // ToDo these break text display
         On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
         Log("~InitCallbacks");
     }
@@ -81,23 +75,6 @@ internal class LanguageSupport : Mod
     private static AssetBundle _abFa = null;
     private static TMP_FontAsset _fa = null;
     private static Sprite _atlas = null;
-
-    private void OnChangeFontByLanguageSetFont(On.ChangeFontByLanguage.orig_SetFont orig, ChangeFontByLanguage self)
-    {
-        Log("!OnChangeFontByLanguageSetFont");
-        orig(self);
-
-        if (_fa == null) return;
-        var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
-        var tmpMat = _fa.material;
-        tmpMat.shader = tmp.font.material.shader;
-
-        _fa.material = tmpMat;
-        tmp.font = _fa;
-
-        ReflectionHelper.SetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro", tmp);
-        Log("~OnChangeFontByLanguageSetFont");
-    }
 
     private new void Log(string message)
     {
@@ -191,21 +168,6 @@ internal class LanguageSupport : Mod
         Log("~InitLanguage");
     }
 
-    private void OnMenuLanguageSettingPushUpdateOptionList(On.UnityEngine.UI.MenuLanguageSetting.orig_PushUpdateOptionList orig, UnityEngine.UI.MenuLanguageSetting self)
-    {
-        Log("!OnMenuLanguageSettingPushUpdateOptionList");
-        orig(self);
-        SupportedLanguages[] langs = ReflectionHelper.GetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs");
-        string[] array = new string[langs.Length];
-        for (int i = 0; i < langs.Length; i++)
-        {
-            array[i] = ((LanguageCode) langs[i]).ToString();
-        }
-
-        self.SetOptionList(array);
-        Log("~OnMenuLanguageSettingPushUpdateOptionList");
-    }
-
     private bool OnLanguageHasLanguageFile(On.Language.Language.orig_HasLanguageFile orig, string lang, string sheetTitle)
     {
         Log("!OnLanguageHasLanguageFile");
@@ -266,5 +228,37 @@ internal class LanguageSupport : Mod
 
         ReflectionHelper.SetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs", finalLangs.ToArray());
         Log("~OnMenuLanguageSettingRefreshAvailableLanguages");
+    }
+
+    private void OnMenuLanguageSettingPushUpdateOptionList(On.UnityEngine.UI.MenuLanguageSetting.orig_PushUpdateOptionList orig, UnityEngine.UI.MenuLanguageSetting self)
+    {
+        Log("!OnMenuLanguageSettingPushUpdateOptionList");
+        orig(self);
+        SupportedLanguages[] langs = ReflectionHelper.GetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs");
+        string[] array = new string[langs.Length];
+        for (int i = 0; i < langs.Length; i++)
+        {
+            array[i] = ((LanguageCode) langs[i]).ToString();
+        }
+
+        self.SetOptionList(array);
+        Log("~OnMenuLanguageSettingPushUpdateOptionList");
+    }
+
+    private void OnChangeFontByLanguageSetFont(On.ChangeFontByLanguage.orig_SetFont orig, ChangeFontByLanguage self)
+    {
+        Log("!OnChangeFontByLanguageSetFont");
+        orig(self);
+
+        if (_fa == null) return;
+        var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
+        var tmpMat = _fa.material;
+        tmpMat.shader = tmp.font.material.shader;
+
+        _fa.material = tmpMat;
+        tmp.font = _fa;
+
+        ReflectionHelper.SetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro", tmp);
+        Log("~OnChangeFontByLanguageSetFont");
     }
 }
