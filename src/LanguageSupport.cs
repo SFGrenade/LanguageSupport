@@ -8,6 +8,8 @@ using GlobalEnums;
 using JetBrains.Annotations;
 using Language;
 using Modding;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -43,6 +45,11 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
 
         InitCallbacks();
         InitLanguage();
+
+        // late because otherwise we'd override shit
+        On.Language.Language.SwitchLanguage_LanguageCode += OnLanguageSwitchLanguage;
+
+        Log("~LanguageSupport");
     }
 
     public override string GetVersion() => SFCore.Utils.Util.GetVersion(Assembly.GetExecutingAssembly());
@@ -52,7 +59,13 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
         Log("!Initialize");
         Instance = this;
 
-        // todo: fixme: reload language from global
+        if (GlobalSettings.lastSelectedLanguage != LanguageCode.N)
+        {
+            GameManager.instance.gameSettings.gameLanguage = (SupportedLanguages)GlobalSettings.lastSelectedLanguage;
+            Language.Language.SwitchLanguage(GlobalSettings.lastSelectedLanguage);
+            GameManager.instance.RefreshLocalization();
+            UIManager.instance.RefreshAchievementsList();
+        }
 
         foreach (var t in Object.FindObjectsOfType<UnityEngine.UI.MenuLanguageSetting>()) t.RefreshControls();
 
@@ -63,29 +76,37 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
     {
         Log("!InitCallbacks");
         // Hooks
+        ModHooks.ApplicationQuitHook += ResetLanguageBeforeGameCloses;
+
         On.Language.Language.HasLanguageFile += OnLanguageHasLanguageFile;
         On.Language.Language.GetLanguageFileContents += OnLanguageGetLanguageFileContents;
         On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages += OnMenuLanguageSettingRefreshAvailableLanguages;
         On.UnityEngine.UI.MenuLanguageSetting.PushUpdateOptionList += OnMenuLanguageSettingPushUpdateOptionList;
+        IL.UnityEngine.UI.MenuLanguageSetting.RefreshCurrentIndex += IlMenuLanguageSettingRefreshCurrentIndex;
 
         On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
         Log("~InitCallbacks");
     }
 
+    private void DeinitCallbacks()
+    {
+        Log("!DeinitCallbacks");
+        // Hooks
+        ModHooks.ApplicationQuitHook -= ResetLanguageBeforeGameCloses;
+
+        On.Language.Language.SwitchLanguage_LanguageCode -= OnLanguageSwitchLanguage;
+        On.Language.Language.HasLanguageFile -= OnLanguageHasLanguageFile;
+        On.Language.Language.GetLanguageFileContents -= OnLanguageGetLanguageFileContents;
+        On.UnityEngine.UI.MenuLanguageSetting.RefreshAvailableLanguages -= OnMenuLanguageSettingRefreshAvailableLanguages;
+        On.UnityEngine.UI.MenuLanguageSetting.PushUpdateOptionList -= OnMenuLanguageSettingPushUpdateOptionList;
+
+        On.ChangeFontByLanguage.SetFont -= OnChangeFontByLanguageSetFont;
+        Log("~DeinitCallbacks");
+    }
+
     private static AssetBundle _abFa = null;
     private static TMP_FontAsset _fa = null;
     private static Sprite _atlas = null;
-
-    private new void Log(string message)
-    {
-        Modding.Logger.Log(message);
-        Debug.Log($"[SFG Thing] - {message}");
-    }
-
-    private new void Log(object message)
-    {
-        Log($"{message}");
-    }
 
     private void InitLanguage()
     {
@@ -168,9 +189,32 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
         Log("~InitLanguage");
     }
 
+    private void ResetLanguageBeforeGameCloses()
+    {
+        Log("!ResetLanguageBeforeGameCloses");
+
+        DeinitCallbacks();
+
+        GameManager.instance.gameSettings.gameLanguage = SupportedLanguages.EN;
+        Language.Language.SwitchLanguage(LanguageCode.EN);
+        GameManager.instance.RefreshLocalization();
+        UIManager.instance.RefreshAchievementsList();
+
+        Log("~ResetLanguageBeforeGameCloses");
+    }
+
+    private bool OnLanguageSwitchLanguage(On.Language.Language.orig_SwitchLanguage_LanguageCode orig, LanguageCode code)
+    {
+        Log($"!OnLanguageSwitchLanguage(code={code})");
+
+        GlobalSettings.lastSelectedLanguage = code;
+
+        Log("~OnLanguageSwitchLanguage");
+        return orig(code);
+    }
+
     private bool OnLanguageHasLanguageFile(On.Language.Language.orig_HasLanguageFile orig, string lang, string sheetTitle)
     {
-        Log("!OnLanguageHasLanguageFile");
         var ret = orig(lang, sheetTitle);
         if (!ret)
         {
@@ -179,31 +223,24 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
                 ret = true;
             }
         }
-
-        Log("~OnLanguageHasLanguageFile");
         return ret;
     }
 
     private string OnLanguageGetLanguageFileContents(On.Language.Language.orig_GetLanguageFileContents orig, string sheetTitle)
     {
-        Log("!OnLanguageGetLanguageFileContents");
         string ret = orig(sheetTitle);
         if (ret == string.Empty)
         {
             if (File.Exists($"{_dir}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt"))
             {
-                Log("~OnLanguageGetLanguageFileContents");
                 return File.ReadAllText($"{_dir}/{Language.Language.CurrentLanguage()}/{sheetTitle}.txt");
             }
         }
-
-        Log("~OnLanguageGetLanguageFileContents");
         return ret;
     }
 
     private void OnMenuLanguageSettingRefreshAvailableLanguages(On.UnityEngine.UI.MenuLanguageSetting.orig_RefreshAvailableLanguages orig, UnityEngine.UI.MenuLanguageSetting self)
     {
-        Log("!OnMenuLanguageSettingRefreshAvailableLanguages");
         orig(self);
         LanguageCode[] customLangs;
         if (GameManager.instance.gameConfig.hideLanguageOption)
@@ -227,12 +264,10 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
         }
 
         ReflectionHelper.SetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs", finalLangs.ToArray());
-        Log("~OnMenuLanguageSettingRefreshAvailableLanguages");
     }
 
     private void OnMenuLanguageSettingPushUpdateOptionList(On.UnityEngine.UI.MenuLanguageSetting.orig_PushUpdateOptionList orig, UnityEngine.UI.MenuLanguageSetting self)
     {
-        Log("!OnMenuLanguageSettingPushUpdateOptionList");
         orig(self);
         SupportedLanguages[] langs = ReflectionHelper.GetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs");
         string[] array = new string[langs.Length];
@@ -242,7 +277,15 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
         }
 
         self.SetOptionList(array);
-        Log("~OnMenuLanguageSettingPushUpdateOptionList");
+    }
+
+    private void IlMenuLanguageSettingRefreshCurrentIndex(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        cursor.Goto(0);
+        cursor.GotoNext(MoveType.Before, x => x.MatchConstrained<SupportedLanguages>());
+        cursor.Remove();
+        cursor.Emit(OpCodes.Constrained, typeof(LanguageCode));
     }
 
     private void OnChangeFontByLanguageSetFont(On.ChangeFontByLanguage.orig_SetFont orig, ChangeFontByLanguage self)
@@ -252,10 +295,10 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
 
         if (_fa == null) return;
         var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
-        var tmpMat = _fa.material;
-        tmpMat.shader = tmp.font.material.shader;
+        // var tmpMat = _fa.material;
+        // tmpMat.shader = tmp.font.material.shader;
 
-        _fa.material = tmpMat;
+        // _fa.material = tmpMat;
         tmp.font = _fa;
 
         ReflectionHelper.SetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro", tmp);
