@@ -38,7 +38,8 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources/tmprofont-test.fixed" />
+    <!--<EmbeddedResource Include="Resources/tmprof*" />-->
+    <EmbeddedResource Include="Resources/58k_characters_fixed_compressed" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Condition="Exists('../SFCore/SFCore.csproj')" Include="../SFCore/SFCore.csproj" />

@@ -34,9 +34,7 @@ internal class LanguageSupport : Mod
             Directory.CreateDirectory(_dir);
         }
 
-        // ToDo debug
         InitCallbacks();
-        // ToDo debug
         InitLanguage();
     }
 
@@ -59,6 +57,8 @@ internal class LanguageSupport : Mod
         Log("!Initialize");
         Instance = this;
 
+        // todo: fixme: reload language from global
+
         foreach (var t in Object.FindObjectsOfType<UnityEngine.UI.MenuLanguageSetting>()) t.RefreshControls();
 
         Log("Initialized");
@@ -75,52 +75,7 @@ internal class LanguageSupport : Mod
 
         // ToDo these break text display
         On.ChangeFontByLanguage.SetFont += OnChangeFontByLanguageSetFont;
-        On.TMPro.TextMeshPro.LoadFontAsset += OnTextMeshProLoadFontAsset;
-        On.TMPro.TMP_FontAsset.ReadFontDefinition += OnTMP_FontAssetReadFontDefinition;
         Log("~InitCallbacks");
-    }
-
-    private void OnTMP_FontAssetReadFontDefinition(On.TMPro.TMP_FontAsset.orig_ReadFontDefinition orig, TMP_FontAsset self)
-    {
-        Log("!OnTMP_FontAssetReadFontDefinition");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, FaceInfo>(self, "m_fontInfo")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, Texture2D>(self, "atlas")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, List<TMP_Glyph>>(self, "m_glyphInfoList")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, Dictionary<int, KerningPair>>(self, "m_characterDictionary")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, KerningTable>(self, "m_kerningDictionary")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, List<TMP_FontAsset>>(self, "m_kerningPair")}");
-        Log($"OnTMP_FontAssetReadFontDefinition - {ReflectionHelper.GetField<TMP_FontAsset, FontCreationSetting>(self, "fontCreationSettings")}");
-
-        orig(self);
-        Log("~OnTMP_FontAssetReadFontDefinition");
-    }
-
-    private void OnTextMeshProLoadFontAsset(On.TMPro.TextMeshPro.orig_LoadFontAsset orig, TextMeshPro self)
-    {
-        Log("!OnTextMeshProLoadFontAsset");
-        var mFontAsset = ReflectionHelper.GetField<TextMeshPro, TMP_FontAsset>(self,"m_fontAsset");
-        var mRenderer = ReflectionHelper.GetField<TextMeshPro, Renderer>(self,"m_renderer");
-        var mSharedMaterial = ReflectionHelper.GetField<TextMeshPro, Material>(self,"m_sharedMaterial");
-
-        if (mFontAsset.name == "noto_serif_thai_bold_tmpro")
-        {
-            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
-            if (mFontAsset.characterDictionary == null)
-            {
-                mFontAsset.ReadFontDefinition();
-            }
-
-            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.characterDictionary}"); // ""
-            Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial}"); // "perpetua_tmpro Material (UnityEngine.Material)"
-            Log($"OnTextMeshProLoadFontAsset - {mRenderer.sharedMaterial.mainTexture}"); // "perpetua_tmpro Atlas (UnityEngine.Texture2D)"
-            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.atlas}"); // ""
-            Log($"OnTextMeshProLoadFontAsset - {mFontAsset.material}");
-            Log($"OnTextMeshProLoadFontAsset - {mRenderer.receiveShadows}");
-            Log($"OnTextMeshProLoadFontAsset - {mRenderer.shadowCastingMode}");
-        }
-
-        orig(self);
-        Log("~OnTextMeshProLoadFontAsset");
     }
 
     private static AssetBundle _abFa = null;
@@ -217,32 +172,18 @@ internal class LanguageSupport : Mod
 
         if (_abFa == null)
         {
-            Log("!InitLanguage - _abFa == null - 0");
             Assembly asm = Assembly.GetExecutingAssembly();
-            Log("!InitLanguage - _abFa == null - 1");
-            using Stream s = asm.GetManifestResourceStream("LanguageSupport.Resources.tmprofont-test.fixed");
-            Log("!InitLanguage - _abFa == null - 2");
+            using Stream s = asm.GetManifestResourceStream("LanguageSupport.Resources.58k_characters_fixed_compressed");
             if (s == null) return;
-            Log("!InitLanguage - _abFa == null - 3");
 
             _abFa = AssetBundle.LoadFromStream(s);
-            Log("!InitLanguage - _abFa == null - 4");
             Object.DontDestroyOnLoad(_abFa);
-            Log("!InitLanguage - _abFa == null - 5");
         }
 
         if (_fa == null && _abFa != null)
         {
-            Log("!InitLanguage - _fa == null && _abFa != null - 0");
-            _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular-4096x2048-0000xD7FF-better");
-            Log("!InitLanguage - _fa == null && _abFa != null - 1");
-            _fa.name = "noto_serif_thai_bold_tmpro";
-            Log("!InitLanguage - _fa == null && _abFa != null - 2");
+            _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular");
             Object.DontDestroyOnLoad(_fa);
-            Log("!InitLanguage - _fa == null && _abFa != null - 3");
-            _fa.fallbackFontAssets = new List<TMP_FontAsset>();
-            Log("!InitLanguage - _fa == null && _abFa != null - 4");
-            //_fa.fallbackFontAssets.AddRange(Object.FindObjectsOfType<TMP_FontAsset>(true));
         }
 
         Language.Language.LoadAvailableLanguages();
@@ -254,7 +195,7 @@ internal class LanguageSupport : Mod
     {
         Log("!OnMenuLanguageSettingPushUpdateOptionList");
         orig(self);
-        SupportedLanguages[] langs = (SupportedLanguages[]) self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+        SupportedLanguages[] langs = ReflectionHelper.GetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs");
         string[] array = new string[langs.Length];
         for (int i = 0; i < langs.Length; i++)
         {
@@ -312,7 +253,7 @@ internal class LanguageSupport : Mod
             customLangs = (Enum.GetValues(typeof(LanguageCode)) as LanguageCode[]);
         }
 
-        SupportedLanguages[] langs = (SupportedLanguages[]) self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+        SupportedLanguages[] langs = ReflectionHelper.GetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs");
         List<SupportedLanguages> finalLangs = new List<SupportedLanguages>();
 
         foreach (var l in customLangs)
@@ -323,13 +264,7 @@ internal class LanguageSupport : Mod
             }
         }
 
-        self.GetType().GetField("langs", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, finalLangs.ToArray());
-
-        //self.optionList = new string[finalLangs.Count];
-        //for (int i = 0; i < finalLangs.Count; i++)
-        //{
-        //    self.optionList[i] = finalLangs[i].ToString();
-        //}
+        ReflectionHelper.SetField<UnityEngine.UI.MenuLanguageSetting, SupportedLanguages[]>(self, "langs", finalLangs.ToArray());
         Log("~OnMenuLanguageSettingRefreshAvailableLanguages");
     }
 }
