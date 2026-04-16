@@ -181,6 +181,41 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
         if (_fa == null && _abFa != null)
         {
             _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular");
+            var tmpMat = _fa.material;
+            var tmp_MainTex = tmpMat.GetTexture("_MainTex");
+            var tmp_FaceTex = tmpMat.GetTexture("_FaceTex");
+            var tmp_FaceColor = tmpMat.GetColor("_FaceColor");
+            var tmp_VertexOffsetX = tmpMat.GetInt("_VertexOffsetX");
+            var tmp_VertexOffsetY = tmpMat.GetInt("_VertexOffsetY");
+            var tmp_MaskSoftnessX = tmpMat.GetInt("_MaskSoftnessX");
+            var tmp_MaskSoftnessY = tmpMat.GetInt("_MaskSoftnessY");
+            var tmp_ClipRect = tmpMat.GetVector("_ClipRect");  // ???
+            var tmp_StencilComp = tmpMat.GetInt("_StencilComp");
+            var tmp_Stencil = tmpMat.GetInt("_Stencil");
+            var tmp_StencilOp = tmpMat.GetInt("_StencilOp");
+            var tmp_StencilWriteMask = tmpMat.GetInt("_StencilWriteMask");
+            var tmp_StencilReadMask = tmpMat.GetInt("_StencilReadMask");
+            var tmp_ColorMask = tmpMat.GetInt("_ColorMask");
+
+            tmpMat.shader = Shader.Find("TextMeshPro/Bitmap");
+
+            // lets try some shit
+            tmpMat.SetTexture("_MainTex", tmp_MainTex);
+            tmpMat.SetTexture("_FaceTex", tmp_FaceTex);
+            tmpMat.SetColor("_FaceColor", tmp_FaceColor);
+            tmpMat.SetInt("_VertexOffsetX", tmp_VertexOffsetX);
+            tmpMat.SetInt("_VertexOffsetY", tmp_VertexOffsetY);
+            tmpMat.SetInt("_MaskSoftnessX", tmp_MaskSoftnessX);
+            tmpMat.SetInt("_MaskSoftnessY", tmp_MaskSoftnessY);
+            tmpMat.SetVector("_ClipRect", tmp_ClipRect);  // ???
+            tmpMat.SetInt("_StencilComp", tmp_StencilComp);
+            tmpMat.SetInt("_Stencil", tmp_Stencil);
+            tmpMat.SetInt("_StencilOp", tmp_StencilOp);
+            tmpMat.SetInt("_StencilWriteMask", tmp_StencilWriteMask);
+            tmpMat.SetInt("_StencilReadMask", tmp_StencilReadMask);
+            tmpMat.SetInt("_ColorMask", tmp_ColorMask);
+
+            _fa.material = tmpMat;
             Object.DontDestroyOnLoad(_fa);
         }
 
@@ -295,10 +330,6 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
 
         if (_fa == null) return;
         var tmp = ReflectionHelper.GetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro");
-        // var tmpMat = _fa.material;
-        // tmpMat.shader = tmp.font.material.shader;
-
-        // _fa.material = tmpMat;
         tmp.font = _fa;
 
         ReflectionHelper.SetField<ChangeFontByLanguage, TextMeshPro>(self, "tmpro", tmp);
