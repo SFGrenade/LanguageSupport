@@ -182,38 +182,23 @@ public class LanguageSupport : GlobalSettingsMod<LsGlobalSettings>
         {
             _fa = _abFa.LoadAsset<TMP_FontAsset>("NotoSerif-Regular");
             var tmpMat = _fa.material;
-            var tmp_MainTex = tmpMat.GetTexture("_MainTex");
-            var tmp_FaceTex = tmpMat.GetTexture("_FaceTex");
-            var tmp_FaceColor = tmpMat.GetColor("_FaceColor");
-            var tmp_VertexOffsetX = tmpMat.GetInt("_VertexOffsetX");
-            var tmp_VertexOffsetY = tmpMat.GetInt("_VertexOffsetY");
-            var tmp_MaskSoftnessX = tmpMat.GetInt("_MaskSoftnessX");
-            var tmp_MaskSoftnessY = tmpMat.GetInt("_MaskSoftnessY");
-            var tmp_ClipRect = tmpMat.GetVector("_ClipRect");  // ???
-            var tmp_StencilComp = tmpMat.GetInt("_StencilComp");
-            var tmp_Stencil = tmpMat.GetInt("_Stencil");
-            var tmp_StencilOp = tmpMat.GetInt("_StencilOp");
-            var tmp_StencilWriteMask = tmpMat.GetInt("_StencilWriteMask");
-            var tmp_StencilReadMask = tmpMat.GetInt("_StencilReadMask");
-            var tmp_ColorMask = tmpMat.GetInt("_ColorMask");
-
             tmpMat.shader = Shader.Find("TextMeshPro/Bitmap");
 
             // lets try some shit
-            tmpMat.SetTexture("_MainTex", tmp_MainTex);
-            tmpMat.SetTexture("_FaceTex", tmp_FaceTex);
-            tmpMat.SetColor("_FaceColor", tmp_FaceColor);
-            tmpMat.SetInt("_VertexOffsetX", tmp_VertexOffsetX);
-            tmpMat.SetInt("_VertexOffsetY", tmp_VertexOffsetY);
-            tmpMat.SetInt("_MaskSoftnessX", tmp_MaskSoftnessX);
-            tmpMat.SetInt("_MaskSoftnessY", tmp_MaskSoftnessY);
-            tmpMat.SetVector("_ClipRect", tmp_ClipRect);  // ???
-            tmpMat.SetInt("_StencilComp", tmp_StencilComp);
-            tmpMat.SetInt("_Stencil", tmp_Stencil);
-            tmpMat.SetInt("_StencilOp", tmp_StencilOp);
-            tmpMat.SetInt("_StencilWriteMask", tmp_StencilWriteMask);
-            tmpMat.SetInt("_StencilReadMask", tmp_StencilReadMask);
-            tmpMat.SetInt("_ColorMask", tmp_ColorMask);
+            tmpMat.SetTexture("_MainTex", _fa.atlas);
+            tmpMat.SetTexture("_FaceTex", null);
+            tmpMat.SetColor("_FaceColor", new Color(1.0f, 1.0f, 1.0f, 1.0f));
+            tmpMat.SetFloat("_VertexOffsetX", 0.0f);
+            tmpMat.SetFloat("_VertexOffsetY", 0.0f);
+            tmpMat.SetFloat("_MaskSoftnessX", 0.0f);
+            tmpMat.SetFloat("_MaskSoftnessY", 0.0f);
+            tmpMat.SetColor("_ClipRect", new Color(-32767.0f, -32767.0f, 32767.0f, 32767.0f));
+            tmpMat.SetFloat("_StencilComp", 8.0f);
+            tmpMat.SetFloat("_Stencil", 0.0f);
+            tmpMat.SetFloat("_StencilOp", 0.0f);
+            tmpMat.SetFloat("_StencilWriteMask", 255.0f);
+            tmpMat.SetFloat("_StencilReadMask", 255.0f);
+            tmpMat.SetFloat("_ColorMask", 15.0f);
 
             _fa.material = tmpMat;
             Object.DontDestroyOnLoad(_fa);
