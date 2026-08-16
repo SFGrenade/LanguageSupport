@@ -22,7 +22,7 @@ jobs:
         shell: bash
 
       - name: Checkout master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: master
           path: master
@@ -44,7 +44,7 @@ jobs:
         working-directory: master
 
       - name: Prepare master artifacts for release
-        uses: christopherhx/gitea-upload-artifact@v4
+        uses: christopherhx/gitea-upload-artifact@v7
         with:
           name: Publish-Master
           path: master/bin/Publish
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: christopherhx/gitea-download-artifact@v4
+        uses: christopherhx/gitea-download-artifact@v8
         with:
           path: artifacts
 
@@ -72,7 +72,7 @@ jobs:
         shell: bash
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           draft: false
           generate_release_notes: true
